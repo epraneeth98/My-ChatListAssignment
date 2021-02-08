@@ -59,7 +59,7 @@ public class FragmentViewModel extends ViewModel {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         Log.d("TAG", "Inside onError of addUser in ViewModel." + e.getMessage());
-                        failureToast(e.getMessage(), context);
+                        NumberExistsToast("Number Already Exists", context);
                     }
                 });
     }
@@ -119,7 +119,7 @@ public class FragmentViewModel extends ViewModel {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         Log.d("TAG", "Inside onError of updateUser in ViewModel");
-                        failureToast(e.getMessage(), context);
+                        NumberExistsToast("Number Already Exists, Data cannot be saved", context);
                     }
                 });
     }
@@ -133,7 +133,7 @@ public class FragmentViewModel extends ViewModel {
         toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
         View view = toast.getView();
 
-        view.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.teal_200), PorterDuff.Mode.SRC_IN);
+        //view.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.teal_200), PorterDuff.Mode.SRC_IN);
 
         toast.show();
     }
@@ -147,6 +147,17 @@ public class FragmentViewModel extends ViewModel {
         View view = toast.getView();
 
         view.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.red), PorterDuff.Mode.SRC_IN);
+
+        toast.show();
+    }
+
+    private void NumberExistsToast(String message, Context context) {
+
+        if (toast != null)
+            toast.cancel();
+
+        toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
+        View view = toast.getView();
 
         toast.show();
     }

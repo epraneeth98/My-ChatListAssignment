@@ -15,6 +15,7 @@ import io.reactivex.Completable;
 
 @Dao
 public interface UserDao {
+
     @Insert
     Completable addUser(User user);
 

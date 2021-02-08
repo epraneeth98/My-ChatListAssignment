@@ -9,8 +9,10 @@ import java.io.Serializable;
 @Entity(tableName = "UserDB")
 public class User implements Serializable {
 
+    @PrimaryKey(autoGenerate = true)
+    private int uid;
+
     private String name;
-    @PrimaryKey
     @NonNull
     private String contactNumber;
     private String profilePic;
@@ -23,7 +25,23 @@ public class User implements Serializable {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public User(int uid, String name, String contactNumber, String profilePic, String dateOfBirth) {
+        this.uid = uid;
+        this.name = name;
+        this.contactNumber = contactNumber;
+        this.profilePic = profilePic;
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public User() {
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public void setUid(int uid) {
+        this.uid = uid;
     }
 
     public String getName() {

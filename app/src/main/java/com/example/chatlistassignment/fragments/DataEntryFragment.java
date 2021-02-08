@@ -28,10 +28,13 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.utils.SaveBitmap;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -40,11 +43,11 @@ import static android.app.Activity.RESULT_CANCELED;
 
 public class DataEntryFragment extends Fragment implements View.OnClickListener {
 
-    EditText editTextUserName, editTextContactNumber;
-    Button buttonSave, buttonSelectProfilePic;
-    TextView textViewBirthday, textViewDatePicker;
+    TextInputLayout editTextUserName, editTextContactNumber;
+    Button buttonSave;
+    TextInputEditText editTextDatePicker;
     String ProfilePicPath;
-    ImageView imageViewProfilePic;
+    ImageView imageViewProfilePic,buttonSelectProfilePic;
     FragmentViewModel fragmentViewModel;
 
     private final int REQUEST_CODE_CAMERA = 0;
@@ -68,13 +71,18 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void init(View view) {
         editTextUserName = view.findViewById(R.id.edit_text_username);
         editTextContactNumber = view.findViewById(R.id.edit_text_contact_number);
-        textViewDatePicker = view.findViewById(R.id.text_view_date_picker);
+        editTextDatePicker = view.findViewById(R.id.text_view_date_picker);
+        editTextDatePicker.setFocusable(false);
         buttonSave = view.findViewById(R.id.button_save);
-        buttonSelectProfilePic = view.findViewById(R.id.button_select_profile_pic);
-        textViewBirthday = view.findViewById(R.id.text_view_birthday);
+        buttonSelectProfilePic = view.findViewById(R.id.image_view_profile_pic);
         imageViewProfilePic = view.findViewById(R.id.image_view_profile_pic);
 
-        textViewDatePicker.setOnClickListener(this);
+        Glide.with(getContext())
+                .load(R.drawable.ic_baseline_person_24)
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .into(imageViewProfilePic);
+
+        editTextDatePicker.setOnClickListener(this);
         buttonSave.setOnClickListener(this);
         buttonSelectProfilePic.setOnClickListener(this);
 
@@ -86,7 +94,7 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
             case R.id.button_save:
                 saveButtonClicked();
                 break;
-            case R.id.button_select_profile_pic:
+            case R.id.image_view_profile_pic:
                 buttonSelectProfilePicClicked();
                 break;
             case R.id.text_view_date_picker:
@@ -100,8 +108,8 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
                 month = month + 1; // As Jan starts from 0
-                String date = "Birthday selected is :" + dayOfMonth + "/" + month + "/" + year;
-                textViewBirthday.setText(date);
+                String date = dayOfMonth + "/" + month + "/" + year;
+                editTextDatePicker.setText(date);
             }
         },
                 Calendar.getInstance().get(Calendar.YEAR),
@@ -191,13 +199,17 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                         Log.d("TAG", "Inside try of onActivity result of DataEntryFragment");
                         cameraImageUri = SaveBitmap.saveBitmapReturnUri(bitmapCameraImage);
                         Log.d("TAG", "cmeraUri: " + cameraImageUri.toString());
-                        Log.d("TAG", "cameraUri: " + cameraImageUri.getPath());
 
                     } catch (IOException e) {
                         Log.d("TAG", "Inside catch: " + e.getMessage());
                         e.printStackTrace();
                     }
                     imageViewProfilePic.setImageURI(cameraImageUri);
+                    Glide.with(getContext())
+                            .load(cameraImageUri)
+                            .placeholder(R.drawable.ic_baseline_person_24)
+                            .circleCrop()
+                            .into(imageViewProfilePic);
 
                     ProfilePicPath = cameraImageUri.toString();
                     break;
@@ -206,6 +218,11 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                     Uri selectedImageUri = data.getData();
                     Log.d("TAG", "URi: " + selectedImageUri.getPath());
                     ProfilePicPath = selectedImageUri.toString();
+                    Glide.with(getContext())
+                            .load(selectedImageUri.toString())
+                            .placeholder(R.drawable.ic_baseline_person_24)
+                            .circleCrop()
+                            .into(imageViewProfilePic);
 
                     imageViewProfilePic.setImageURI(selectedImageUri);
                     break;
@@ -215,24 +232,23 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
 
 
     private void saveButtonClicked() {
-        String userName = editTextUserName.getText().toString();
-        String contactNumber = editTextContactNumber.getText().toString();
+        String userName = editTextUserName.getEditText().getText().toString();
+        String contactNumber = editTextContactNumber.getEditText().getText().toString();
 
         if (userName.equals("") || contactNumber.equals("")) {
             Toast.makeText(getContext(), "Please enter all the details", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String birthDateString = textViewBirthday.getText().toString();
+        String birthDateString = editTextDatePicker.getText().toString();
         int indexOfColon = birthDateString.indexOf(":");
         String birthDate = birthDateString.substring(indexOfColon + 1);
 
         User user = new User(userName, contactNumber, ProfilePicPath, birthDate);
-
+        ProfilePicPath =  null;
         fragmentViewModel.addUser(user, getContext());
 
         clearInputFields();
-
         changeTabChatList();
 
     }
@@ -243,10 +259,9 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     }
 
     private void clearInputFields() {
-        editTextUserName.setText("");
-        editTextContactNumber.setText("");
-        textViewBirthday.setText(R.string.birthday_selected);
-        imageViewProfilePic.setImageDrawable(null);
+        editTextUserName.getEditText().setText("");
+        editTextContactNumber.getEditText().setText("");
+        editTextDatePicker.setText("");
         imageViewProfilePic.setImageResource(R.drawable.ic_baseline_person_24);
     }
 }

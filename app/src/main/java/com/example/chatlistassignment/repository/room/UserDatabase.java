@@ -14,20 +14,21 @@ import com.example.chatlistassignment.model.User;
 @Database(entities = User.class, version = 1)
 public abstract class UserDatabase extends RoomDatabase {
 
-    private static UserDatabase userDatabase;
+    private static UserDatabase INSTANCE;
 
     public static UserDatabase getInstance(Context context) {
-        if (userDatabase == null)
-            userDatabase = Room.databaseBuilder(context, UserDatabase.class, "User_Database").build();
-//        userDatabase = Room.databaseBuilder(context, UserDatabase.class, "User_Database")
+        if (INSTANCE == null)
+            INSTANCE = Room.databaseBuilder(context, UserDatabase.class, "User_Database").build();
+//            Room.databaseBuilder(context, UserDatabase.class, "User_Database")
 //                .addMigrations(MIGRATION_1_2).build();
-        return userDatabase;
+        return INSTANCE;
     }
 
     static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            //database.execSQL();
+            database.execSQL("ALTER TABLE User "
+                    + " ADD COLUMN joining_year INTEGER");
         }
     };
 
