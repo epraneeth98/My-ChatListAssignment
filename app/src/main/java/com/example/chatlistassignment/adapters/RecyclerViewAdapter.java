@@ -18,7 +18,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -120,8 +122,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mainLayout = itemView.findViewById(R.id.main_layout);
             txtEdit = itemView.findViewById(R.id.txtEdit);
             swipeRevealLayout = itemView.findViewById(R.id.swipelayout);
-            fragmentViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(FragmentViewModel.class);
-
+            fragmentViewModel = ViewModelProviders.of((FragmentActivity) context).get(FragmentViewModel.class);
             mainLayout.setOnClickListener(v -> {
                 Log.d("abc", "cclliekd");
                 Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);

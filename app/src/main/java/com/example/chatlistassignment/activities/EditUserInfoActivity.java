@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.example.chatlistassignment.R;
@@ -57,7 +58,7 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
         User user = (User) getIntent().getSerializableExtra("User");
         uid = user.getUid();
         ProfilePicPath = user.getProfilePic();
-        fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
+        fragmentViewModel = ViewModelProviders.of(this).get(FragmentViewModel.class);
         init(user);
     }
 
