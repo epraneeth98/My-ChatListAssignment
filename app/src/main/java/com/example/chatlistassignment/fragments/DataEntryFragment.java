@@ -26,7 +26,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
@@ -57,8 +56,7 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentViewModel = ViewModelProviders.of(this).get(FragmentViewModel.class);
-        //fragmentViewModel = new FragmentViewModel(getActivity().getApplication());
+        fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
     }
 
     @Override

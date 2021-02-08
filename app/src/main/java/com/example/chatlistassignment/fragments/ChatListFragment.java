@@ -9,11 +9,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
@@ -21,8 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +43,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     LinearLayoutManager layoutManager;
     RecyclerViewAdapter recyclerViewAdapter;
     ArrayList<User> userArrayList;
+
     ArrayList<User> queryArrayList;
     ArrayList<User> multiselect_list = new ArrayList<>();
     Menu context_menu;
@@ -53,12 +52,10 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     FragmentViewModel fragmentViewModel;
     AlertDialogHelper alertDialogHelper;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
-        fragmentViewModel = ViewModelProviders.of(this).get(FragmentViewModel.class);
+        fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
         userArrayList = new ArrayList<>();
         queryArrayList = new ArrayList<>();
     }
@@ -79,13 +76,12 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
                 else
                     Toast.makeText(getActivity(), "Details Page", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onItemLongClick(View view, int position) {
-                Log.d("abc", "Her in on ItemLongClick");
                 if (!isMultiSelect) {
                     multiselect_list = new ArrayList<User>();
                     isMultiSelect = true;
-
                     if (mActionMode == null) {
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
                     }
@@ -95,7 +91,6 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         }));
         return view;
     }
-
 
     //Important
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
@@ -176,13 +171,14 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         layoutManager = new LinearLayoutManager(getContext());
         recyclerViewAdapter = new RecyclerViewAdapter(getContext(), userArrayList, this);
 
+        recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(recyclerViewAdapter);
 
     }
 
     public void refreshAdapter() {
-        //recyclerViewAdapter.selected_usersList = multiselect_list;
+        recyclerViewAdapter.selected_usersList = multiselect_list;
         recyclerViewAdapter.userArrayList = userArrayList;
         recyclerViewAdapter.notifyDataSetChanged();
     }
@@ -206,28 +202,10 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
 
     @Override
     public void onItemClicked(View view, int position) {
-        switch (view.getId()) {
-            case R.id.button_delete:
-                Log.d("abc", "Here clicked 11");
-                fragmentViewModel.deleteUser(userArrayList.get(position), getContext());
-                break;
-            case R.id.button_edit:
-                Intent intentEditUserInfoActivity = new Intent(getContext(), EditUserInfoActivity.class);
-                intentEditUserInfoActivity.putExtra("User", userArrayList.get(position));
-                startActivity(intentEditUserInfoActivity);
-                break;
-            default:
-                Log.d("abc", "Clicked !!");
-                Intent intentEditUserInfoActivity2 = new Intent(getContext(), EditUserInfoActivity.class);
-                intentEditUserInfoActivity2.putExtra("User", userArrayList.get(position));
-                startActivity(intentEditUserInfoActivity2);
-                break;
-        }
-    }
-
-    @Override
-    public void onItemLongClicked(View v, int position, int adapterPosition) {
-
+        Log.d("abc", "Clicked !!");
+        Intent intentEditUserInfoActivity2 = new Intent(getContext(), EditUserInfoActivity.class);
+        intentEditUserInfoActivity2.putExtra("User", userArrayList.get(position));
+        startActivity(intentEditUserInfoActivity2);
     }
 
     @Override

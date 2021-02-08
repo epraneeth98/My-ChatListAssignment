@@ -58,7 +58,6 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
         uid = user.getUid();
         ProfilePicPath = user.getProfilePic();
         fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
-
         init(user);
     }
 
@@ -115,21 +114,15 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
 
     private void buttonSelectProfilePicClicked() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Choose your profile picture");
-
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int item) {
                 if (options[item].equals("Take Photo")) {
-
                     checkPermissionAndStartCamera();
-
                 } else if (options[item].equals("Choose from Gallery")) {
-
                     checkPermissionAndOpenGallery();
-
                 } else
                     dialogInterface.dismiss();
             }

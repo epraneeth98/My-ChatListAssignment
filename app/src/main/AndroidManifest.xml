@@ -13,12 +13,12 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ChatListAssignment"
-        android:windowSoftInputMode="stateVisible|adjustPan">
+        android:theme="@style/Theme.ChatListAssignment">
         <activity android:name=".activities.EditUserInfoActivity" />
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -34,23 +34,23 @@ public class AlertDialogHelper {
         alertDialogBuilder.setTitle(title);
         alertDialogBuilder.setMessage(message);
 
-        if (!TextUtils.isEmpty(positive)) {
-            alertDialogBuilder.setPositiveButton(Html.fromHtml("<font color='#FF0000'>" + positive + "</font>"),
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface arg0, int arg1) {
-                            callBack.onPositiveClick(from);
-                            alertDialog.dismiss();
-                        }
-                    });
-        }
-        if (!TextUtils.isEmpty(negative)) {
-            alertDialogBuilder.setNegativeButton(negative,
-                    (arg0, arg1) -> {
+        alertDialogBuilder.setPositiveButton(Html.fromHtml("<font color='#FF0000'>" + positive + "</font>"),
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        callBack.onPositiveClick(from);
+                        alertDialog.dismiss();
+                    }
+                });
+        alertDialogBuilder.setNegativeButton(negative,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                         callBack.onNegativeClick(from);
                         alertDialog.dismiss();
-                    });
-        }
+                    }
+                });
+
         alertDialogBuilder.setCancelable(isCancelable);
         alertDialog = alertDialogBuilder.create();
         alertDialog.show();

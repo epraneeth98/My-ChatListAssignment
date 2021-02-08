@@ -8,26 +8,17 @@ import android.net.Uri;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -37,13 +28,11 @@ import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
-import com.example.chatlistassignment.activities.MainActivity;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
 
-import static android.os.Build.VERSION_CODES.M;
 import static java.security.AccessController.getContext;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -52,8 +41,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ArrayList<User> userArrayList;
     ItemClickListener itemClickListener;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
-    public ArrayList<Integer> selected_usersList = new ArrayList<>();
-    boolean long_press_enabled = false;
+    public ArrayList<User> selected_usersList = new ArrayList<>();
 
     public RecyclerViewAdapter(Context context, ArrayList<User> userArrayList, ItemClickListener itemClickListener) {
         this.context = context;
@@ -72,14 +60,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         viewBinderHelper.setOpenOnlyOne(true);
-        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(userArrayList.get(position).getName()));
-        viewBinderHelper.closeLayout(String.valueOf(userArrayList.get(position).getName()));
-        Log.d("abc", String.valueOf(userArrayList.get(position)));
+        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(userArrayList.get(position).getUid()));
+        viewBinderHelper.closeLayout(String.valueOf(userArrayList.get(position).getUid()));
         holder.bindData(userArrayList.get(position));
 
         User user = userArrayList.get(position);
         holder.textViewName.setText(user.getName());
         holder.textViewNumber.setText(user.getContactNumber());
+
         if (user.getProfilePic() == null) {
             holder.imageViewProfilePic.setImageResource(R.drawable.ic_baseline_person_24);
             Glide.with(context)
@@ -95,51 +83,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     .into(holder.imageViewProfilePic);
         }
 
-//        if (selected_usersList.contains(userArrayList.get(position)))
-//            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.sky_blue));
-//        else
-//            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
-/////////////
-
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                selected_usersList.clear();
-                if (long_press_enabled) {
-                    long_press_enabled = false;
-                }else{
-                    long_press_enabled = true;
-                    selected_usersList.add(user.getUid());
-                    Log.d("abc", "in adapter onLOngClick:" + user.getName());
-                }
-
-//                MenuInflater inflater = .getMenuInflater();
-//                this.menu = menu;
-//                inflater.inflate(R.menu.menu_multi_select, menu);
-                return false;
-            }
-        });
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("abc", "in adapter onClick:" + user.getName());
-                if (long_press_enabled) {
-                    if (selected_usersList.contains(user.getUid())) {
-                        selected_usersList.remove(user.getUid());
-                        holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.white));
-                    } else {
-                        selected_usersList.add(user.getUid());
-                        holder.itemView.setBackgroundColor(context.getResources().getColor(R.color._light_green));
-                    }
-                } else {
-                    Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-                    intentEditUserInfoActivity.putExtra("User", userArrayList.get(position));
-                    context.startActivity(intentEditUserInfoActivity);
-                }
-            }
-        });
+        if (selected_usersList.contains(userArrayList.get(position)))
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.sky_blue));
+        else
+            holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
-
 
     @Override
     public int getItemCount() {
@@ -151,12 +99,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         notifyDataSetChanged();
     }
 
-
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView imageViewProfilePic;
         TextView textViewName, textViewNumber;
-        Button buttonEdit, buttonDelete;
 
         Button txtEdit, txtDelete;
         RelativeLayout mainLayout;
@@ -170,16 +116,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             textViewName = itemView.findViewById(R.id.text_view_name);
             textViewNumber = itemView.findViewById(R.id.text_view_number);
 
-            buttonEdit = itemView.findViewById(R.id.button_edit);
-            buttonEdit.setVisibility(View.GONE);
-            buttonDelete = itemView.findViewById(R.id.button_delete);
-            buttonDelete.setVisibility(View.GONE);
-
             txtDelete = itemView.findViewById(R.id.txtDelete);
             mainLayout = itemView.findViewById(R.id.main_layout);
             txtEdit = itemView.findViewById(R.id.txtEdit);
             swipeRevealLayout = itemView.findViewById(R.id.swipelayout);
-            fragmentViewModel = ViewModelProviders.of((FragmentActivity) context).get(FragmentViewModel.class);
+            fragmentViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(FragmentViewModel.class);
 
             mainLayout.setOnClickListener(v -> {
                 Log.d("abc", "cclliekd");
@@ -221,14 +162,5 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             if (itemClickListener != null)
                 itemClickListener.onItemClicked(view, getAdapterPosition());
         }
-
-        @Override
-        public boolean onLongClick(View v) {
-            Log.d("TAG", "onLongClick boolean called: " + v.getId());
-            if (itemClickListener != null)
-                itemClickListener.onItemLongClicked(v, (getAdapterPosition()), getAdapterPosition());
-            return true;
-        }
     }
-
 }
