@@ -19,11 +19,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,11 +72,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         viewBinderHelper.setOpenOnlyOne(true);
-//        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(userArrayList.get(position).getName()));
+        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(userArrayList.get(position).getName()));
         viewBinderHelper.closeLayout(String.valueOf(userArrayList.get(position).getName()));
         Log.d("abc", String.valueOf(userArrayList.get(position)));
         holder.bindData(userArrayList.get(position));
-
 
         User user = userArrayList.get(position);
         holder.textViewName.setText(user.getName());
@@ -176,13 +179,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mainLayout = itemView.findViewById(R.id.main_layout);
             txtEdit = itemView.findViewById(R.id.txtEdit);
             swipeRevealLayout = itemView.findViewById(R.id.swipelayout);
-            fragmentViewModel = new ViewModelProvider((ViewModelStoreOwner) context).get(FragmentViewModel.class);
+            fragmentViewModel = ViewModelProviders.of((FragmentActivity) context).get(FragmentViewModel.class);
 
             mainLayout.setOnClickListener(v -> {
-//                Log.d("abc", "cclliekd");
-//                Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-//                intentEditUserInfoActivity.putExtra("User", userArrayList.get(getAdapterPosition()));
-//                context.startActivity(intentEditUserInfoActivity);
+                Log.d("abc", "cclliekd");
+                Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
+                intentEditUserInfoActivity.putExtra("User", userArrayList.get(getAdapterPosition()));
+                context.startActivity(intentEditUserInfoActivity);
             });
 
             txtEdit.setOnClickListener(v -> {

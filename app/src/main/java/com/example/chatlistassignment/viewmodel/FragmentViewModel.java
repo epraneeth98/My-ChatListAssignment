@@ -1,5 +1,6 @@
 package com.example.chatlistassignment.viewmodel;
 
+import android.app.Application;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.util.Log;
@@ -7,12 +8,14 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.model.User;
+import com.example.chatlistassignment.repository.LocalRepository;
 import com.example.chatlistassignment.repository.room.UserDatabase;
 
 import java.util.List;
@@ -24,12 +27,17 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class FragmentViewModel extends ViewModel {
+public class FragmentViewModel extends AndroidViewModel {
 
-    private UserDatabase userDatabase;
+    private LocalRepository repository;
     private Toast toast;
 
     public static MutableLiveData<String> queryString = new MutableLiveData<>();
+
+    public FragmentViewModel(@NonNull Application application) {
+        super(application);
+        repository = new LocalRepository(getApplication());
+    }
 
     public static void setQueryString(String query) {
         queryString.setValue(query);
@@ -40,8 +48,7 @@ public class FragmentViewModel extends ViewModel {
     }
 
     public void addUser(User user, Context context) {
-        userDatabase = UserDatabase.getInstance(context);
-        userDatabase.userDao().addUser(user)
+        repository.addUser(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
@@ -65,18 +72,15 @@ public class FragmentViewModel extends ViewModel {
     }
 
     public LiveData<List<User>> getAllUser(Context context) {
-        userDatabase = UserDatabase.getInstance(context);
-        return userDatabase.userDao().getAllUser();
+        return repository.getAllUser();
     }
 
     public LiveData<List<User>> queryAllUser(Context context, String query) {
-        userDatabase = UserDatabase.getInstance(context);
-        return userDatabase.userDao().queryAllUser(query);
+        return repository.queryAllUser(query);
     }
 
     public void deleteUser(User user, Context context) {
-        userDatabase = UserDatabase.getInstance(context);
-        userDatabase.userDao().deleteUser(user)
+        repository.deleteUser(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
@@ -100,8 +104,7 @@ public class FragmentViewModel extends ViewModel {
     }
 
     public void updateUser(User user, Context context) {
-        userDatabase = UserDatabase.getInstance(context);
-        userDatabase.userDao().updateUser(user)
+        repository.updateUser(user)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new CompletableObserver() {
@@ -162,4 +165,9 @@ public class FragmentViewModel extends ViewModel {
         toast.show();
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        //compositeDisposable.dispose();
+    }
 }

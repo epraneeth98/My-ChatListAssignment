@@ -21,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -44,7 +45,6 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     LinearLayoutManager layoutManager;
     RecyclerViewAdapter recyclerViewAdapter;
     ArrayList<User> userArrayList;
-
     ArrayList<User> queryArrayList;
     ArrayList<User> multiselect_list = new ArrayList<>();
     Menu context_menu;
@@ -57,7 +57,8 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
+        //fragmentViewModel = new ViewModelProvider(this).get(FragmentViewModel.class);
+        fragmentViewModel = ViewModelProviders.of(this).get(FragmentViewModel.class);
         userArrayList = new ArrayList<>();
         queryArrayList = new ArrayList<>();
     }
@@ -175,7 +176,6 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         layoutManager = new LinearLayoutManager(getContext());
         recyclerViewAdapter = new RecyclerViewAdapter(getContext(), userArrayList, this);
 
-        recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(recyclerViewAdapter);
 
