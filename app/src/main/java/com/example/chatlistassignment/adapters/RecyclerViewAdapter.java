@@ -1,10 +1,12 @@
 package com.example.chatlistassignment.adapters;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,8 @@ import com.chauthai.swipereveallayout.ViewBinderHelper;
 import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
+import com.example.chatlistassignment.activities.FullScreenImageActivity;
+import com.example.chatlistassignment.activities.MainActivity;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
@@ -43,30 +47,26 @@ import static java.security.AccessController.getContext;
 public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdapter.ViewHolder> {
 
     Context context;
-    public List<User> userArrayList;
     ItemClickListener itemClickListener;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
     public ArrayList<User> selected_usersList = new ArrayList<>();
 
     private static DiffUtil.ItemCallback<User> DIFF_CALLBACK = new DiffUtil.ItemCallback<User>() {
-                // Concert details may have changed if reloaded from the database,
-                // but ID is fixed.
-                @Override
-                public boolean areItemsTheSame(User oldUser, User newUser) {
-                    return oldUser.getUid() == newUser.getUid();
-                }
+        @Override
+        public boolean areItemsTheSame(User oldUser, User newUser) {
+            return oldUser.getUid() == newUser.getUid();
+        }
 
-                @Override
-                public boolean areContentsTheSame(User oldUser,
-                                                  User newUser) {
-                    return oldUser.equals(newUser);
-                }
-            };
+        @Override
+        public boolean areContentsTheSame(User oldUser,
+                                          User newUser) {
+            return oldUser.equals(newUser);
+        }
+    };
 
-    public RecyclerViewAdapter(Context context, ArrayList<User> userArrayList, ItemClickListener itemClickListener) {
+    public RecyclerViewAdapter(Context context, ItemClickListener itemClickListener) {
         super(DIFF_CALLBACK);
         this.context = context;
-        this.userArrayList = userArrayList;
         this.itemClickListener = itemClickListener;
         viewBinderHelper.setOpenOnlyOne(true);
     }
@@ -76,19 +76,16 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.row_chat_data, parent, false);
         return new ViewHolder(view);
-        //viewBinderHelper = new ViewBinderHelper()
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         viewBinderHelper.setOpenOnlyOne(true);
-        User u = getItem(position);
-        Log.d("abc","---chehking in bindViewhelper-->"+u.getName());
+        User user = getItem(position);
+        Log.d("abc", "In OnBindViewHolder in adapter: " + user.getName());
         viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(getItem(position).getUid()));
         viewBinderHelper.closeLayout(String.valueOf(getItem(position).getUid()));
         holder.bindData(getItem(position));
-
-        User user = getItem(position);
         holder.textViewName.setText(user.getName());
         holder.textViewNumber.setText(user.getContactNumber());
 
@@ -106,6 +103,19 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
                     .circleCrop()
                     .into(holder.imageViewProfilePic);
         }
+        holder.imageViewProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("abc", "In onBindView Holder in adapter: Image clicked");
+                if (getItem(position).getProfilePic() == null) {
+                    Toast.makeText(context, "No image to view", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(context, FullScreenImageActivity.class);
+                    intent.putExtra("imageUri", getItem(position).getProfilePic());
+                    context.startActivity(intent);
+                }
+            }
+        });
 
         if (selected_usersList.contains(getItem(position)))
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.sky_blue));
@@ -113,21 +123,9 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
-//    @Override
-//    public int getItemCount() {
-//        return userArrayList == null ? 0 : userArrayList.size();
-//    }
-
-//    public void updateData(ArrayList<User> userArrayList) {
-//        this.userArrayList = userArrayList;
-//        notifyDataSetChanged();
-//    }
-
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         ImageView imageViewProfilePic;
         TextView textViewName, textViewNumber;
-
         Button txtEdit, txtDelete;
         RelativeLayout mainLayout;
         FragmentViewModel fragmentViewModel;
@@ -135,11 +133,9 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-
             imageViewProfilePic = itemView.findViewById(R.id.image_view_profile_pic);
             textViewName = itemView.findViewById(R.id.text_view_name);
             textViewNumber = itemView.findViewById(R.id.text_view_number);
-
             txtDelete = itemView.findViewById(R.id.txtDelete);
             mainLayout = itemView.findViewById(R.id.main_layout);
             txtEdit = itemView.findViewById(R.id.txtEdit);
@@ -151,7 +147,6 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
                 intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
                 context.startActivity(intentEditUserInfoActivity);
             });
-
             txtEdit.setOnClickListener(v -> {
                 Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
                 intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
@@ -162,12 +157,8 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
             txtDelete.setOnClickListener(v -> {
                 Log.d("abc", "Finally hrere");
                 DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                    switch (which) {
-                        default:
-                            swipeRevealLayout.close(true);
-                    }
+                    swipeRevealLayout.close(true);
                 };
-
                 AlertDialog.Builder ab = new AlertDialog.Builder(context);
                 ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(getItem(getAdapterPosition()), context));
                 ab.setMessage("Are you sure want to delete this contact? \n\nNote: Use long press to delete multiple contacts.")

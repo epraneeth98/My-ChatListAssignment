@@ -45,11 +45,9 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     LinearLayoutManager layoutManager;
     RecyclerViewAdapter recyclerViewAdapter;
     List<User> userArrayList;
-
     ArrayList<User> queryArrayList;
     ArrayList<User> multiselect_list = new ArrayList<>();
     Menu context_menu;
-
     boolean isMultiSelect = false;
     FragmentViewModel fragmentViewModel;
     AlertDialogHelper alertDialogHelper;
@@ -83,7 +81,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
             @Override
             public void onItemLongClick(View view, int position) {
                 if (!isMultiSelect) {
-                    multiselect_list = new ArrayList<User>();
+                    multiselect_list = new ArrayList<>();
                     isMultiSelect = true;
                     if (mActionMode == null) {
                         mActionMode = getActivity().startActionMode(mActionModeCallback);
@@ -163,15 +161,6 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
                         recyclerViewAdapter.submitList(users);
                     }
                 }
-
-//                new Observer<List<User>>() {
-//            @Override
-//            public void onChanged(List<User> users) {
-//                queryArrayList.clear();
-//                queryArrayList = (ArrayList<User>) users;
-//                //recyclerViewAdapter.updateData(queryArrayList);
-//            }
-//        }
         );
     }
 
@@ -179,32 +168,29 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         alertDialogHelper = new AlertDialogHelper(getContext(), ChatListFragment.this);
         recyclerViewChatList = view.findViewById(R.id.recyclerview_chat_list);
         layoutManager = new LinearLayoutManager(getContext());
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), (ArrayList<User>) userArrayList, this);
-
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), this);
         recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(recyclerViewAdapter);
-
     }
 
     public void refreshAdapter() {
         recyclerViewAdapter.selected_usersList = multiselect_list;
-        recyclerViewAdapter.userArrayList = userArrayList;
-        //recyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void multi_select(int position) {
         if (mActionMode != null) {
             if (multiselect_list.contains(userArrayList.get(position))) {
                 multiselect_list.remove(userArrayList.get(position));
+                //recyclerViewAdapter.SelectedUsersListChanged(multiselect_list);
             } else {
                 multiselect_list.add(userArrayList.get(position));
+                //recyclerViewAdapter.SelectedUsersListChanged(multiselect_list);
             }
             if (multiselect_list.size() > 0)
                 mActionMode.setTitle("" + multiselect_list.size());
             else
-                mActionMode.setTitle("");
-
+                mActionMode.setTitle("0");
             refreshAdapter();
 
         }
