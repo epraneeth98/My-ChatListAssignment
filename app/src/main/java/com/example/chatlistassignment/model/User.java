@@ -5,6 +5,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Entity(tableName = "UserDB")
 public class User implements Serializable {
@@ -74,5 +75,22 @@ public class User implements Serializable {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return uid == user.uid &&
+                name.equals(user.name) &&
+                Objects.equals(contactNumber, user.contactNumber) &&
+                Objects.equals(profilePic, user.profilePic) &&
+                Objects.equals(dateOfBirth, user.dateOfBirth);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uid, name, contactNumber, profilePic, dateOfBirth);
     }
 }

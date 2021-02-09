@@ -10,6 +10,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.paging.DataSource;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
 
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.repository.LocalRepository;
@@ -29,12 +32,20 @@ public class FragmentViewModel extends AndroidViewModel {
     private UserDatabase userDatabase;
     private LocalRepository repository;
     private Toast toast;
+    public LiveData<PagedList<User>> userList;
+    public LiveData<PagedList<User>> queriedUserList;
 
     public static MutableLiveData<String> queryString = new MutableLiveData<>();
 
     public FragmentViewModel(@androidx.annotation.NonNull Application application) {
         super(application);
         repository = new LocalRepository(getApplication());
+        userList = new LivePagedListBuilder<>(
+                repository.getAllUser(), /* page size */ 3).build();
+    }
+    public void queryInit(String query) {
+        repository = new LocalRepository(getApplication());
+        queriedUserList = new LivePagedListBuilder<>(repository.queryAllUser(query), 5).build();
     }
 
     public static void setQueryString(String query) {
@@ -69,11 +80,11 @@ public class FragmentViewModel extends AndroidViewModel {
                 });
     }
 
-    public LiveData<List<User>> getAllUser(Context context) {
-        return repository.getAllUser();
-    }
+//    public DataSource.Factory<Integer, User> getAllUser(Context context) {
+//        return repository.getAllUser();
+//    }
 
-    public LiveData<List<User>> queryAllUser(Context context, String query) {
+    public DataSource.Factory<Integer, User> queryAllUser(Context context, String query) {
         return repository.queryAllUser(query);
     }
 

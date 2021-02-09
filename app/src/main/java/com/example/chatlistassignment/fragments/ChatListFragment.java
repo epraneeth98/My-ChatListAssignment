@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -43,7 +44,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     RecyclerView recyclerViewChatList;
     LinearLayoutManager layoutManager;
     RecyclerViewAdapter recyclerViewAdapter;
-    ArrayList<User> userArrayList;
+    List<User> userArrayList;
 
     ArrayList<User> queryArrayList;
     ArrayList<User> multiselect_list = new ArrayList<>();
@@ -65,17 +66,18 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat_list, container, false);
-        init(view);
         observeForDbChanges();
         observeQueryString();
+        init(view);
 
         recyclerViewChatList.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), recyclerViewChatList, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 if (isMultiSelect)
                     multi_select(position);
-                else
+                else {
                     Toast.makeText(getActivity(), "Details Page", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -132,8 +134,18 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         }
     };
 
+    private void observeForDbChanges() {
+        fragmentViewModel.userList.observe(getViewLifecycleOwner(), new Observer<PagedList<User>>() {
+            @Override
+            public void onChanged(PagedList<User> users) {
+                userArrayList = users.snapshot();
+                recyclerViewAdapter.submitList(users);
+            }
+        });
+    }
+
     private void observeQueryString() {
-        fragmentViewModel.getQueryString().observe(this, new Observer<String>() {
+        fragmentViewModel.getQueryString().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(String query) {
                 Log.d("TAG", "Inside ChatListFragment: " + query);
@@ -144,33 +156,30 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
 
     private void queryChatList(String query) {
         query = "%" + query + "%";
+        fragmentViewModel.queryInit(query);
+        fragmentViewModel.queriedUserList.observe(this, new Observer<PagedList<User>>() {
+                    @Override
+                    public void onChanged(PagedList<User> users) {
+                        recyclerViewAdapter.submitList(users);
+                    }
+                }
 
-        fragmentViewModel.queryAllUser(getContext(), query).observe(this, new Observer<List<User>>() {
-            @Override
-            public void onChanged(List<User> users) {
-                queryArrayList.clear();
-                queryArrayList = (ArrayList<User>) users;
-                recyclerViewAdapter.updateData(queryArrayList);
-            }
-        });
-    }
-
-    private void observeForDbChanges() {
-        fragmentViewModel.getAllUser(getContext()).observe(this, new Observer<List<User>>() {
-            @Override
-            public void onChanged(List<User> users) {
-                userArrayList.clear();
-                userArrayList = (ArrayList<User>) users;
-                recyclerViewAdapter.updateData(userArrayList);
-            }
-        });
+//                new Observer<List<User>>() {
+//            @Override
+//            public void onChanged(List<User> users) {
+//                queryArrayList.clear();
+//                queryArrayList = (ArrayList<User>) users;
+//                //recyclerViewAdapter.updateData(queryArrayList);
+//            }
+//        }
+        );
     }
 
     private void init(View view) {
         alertDialogHelper = new AlertDialogHelper(getContext(), ChatListFragment.this);
         recyclerViewChatList = view.findViewById(R.id.recyclerview_chat_list);
         layoutManager = new LinearLayoutManager(getContext());
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), userArrayList, this);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), (ArrayList<User>) userArrayList, this);
 
         recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
@@ -181,7 +190,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     public void refreshAdapter() {
         recyclerViewAdapter.selected_usersList = multiselect_list;
         recyclerViewAdapter.userArrayList = userArrayList;
-        recyclerViewAdapter.notifyDataSetChanged();
+        //recyclerViewAdapter.notifyDataSetChanged();
     }
 
     public void multi_select(int position) {

@@ -3,10 +3,15 @@ package com.example.chatlistassignment.repository;
 import android.content.Context;
 
 import androidx.lifecycle.LiveData;
+import androidx.paging.DataSource;
+
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.repository.room.UserDao;
 import com.example.chatlistassignment.repository.room.UserDatabase;
 import java.util.List;
+
+import javax.xml.datatype.DatatypeFactory;
+
 import io.reactivex.Completable;
 
 public class LocalRepository {
@@ -29,11 +34,11 @@ public class LocalRepository {
         return userDao.updateUser(user);
     }
 
-    public LiveData<List<User>> getAllUser() {
+    public DataSource.Factory<Integer, User> getAllUser() {
         return userDao.getAllUser();
     }
 
-    public LiveData<List<User>> queryAllUser(String query) {
+    public DataSource.Factory<Integer, User> queryAllUser(String query) {
         return userDao.queryAllUser(query);
     }
 

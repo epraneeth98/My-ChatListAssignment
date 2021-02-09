@@ -22,6 +22,8 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.paging.PagedListAdapter;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -34,18 +36,35 @@ import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static java.security.AccessController.getContext;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdapter.ViewHolder> {
 
     Context context;
-    public ArrayList<User> userArrayList;
+    public List<User> userArrayList;
     ItemClickListener itemClickListener;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
     public ArrayList<User> selected_usersList = new ArrayList<>();
 
+    private static DiffUtil.ItemCallback<User> DIFF_CALLBACK = new DiffUtil.ItemCallback<User>() {
+                // Concert details may have changed if reloaded from the database,
+                // but ID is fixed.
+                @Override
+                public boolean areItemsTheSame(User oldUser, User newUser) {
+                    return oldUser.getUid() == newUser.getUid();
+                }
+
+                @Override
+                public boolean areContentsTheSame(User oldUser,
+                                                  User newUser) {
+                    return oldUser.equals(newUser);
+                }
+            };
+
     public RecyclerViewAdapter(Context context, ArrayList<User> userArrayList, ItemClickListener itemClickListener) {
+        super(DIFF_CALLBACK);
         this.context = context;
         this.userArrayList = userArrayList;
         this.itemClickListener = itemClickListener;
@@ -57,16 +76,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.row_chat_data, parent, false);
         return new ViewHolder(view);
+        //viewBinderHelper = new ViewBinderHelper()
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         viewBinderHelper.setOpenOnlyOne(true);
-        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(userArrayList.get(position).getUid()));
-        viewBinderHelper.closeLayout(String.valueOf(userArrayList.get(position).getUid()));
-        holder.bindData(userArrayList.get(position));
+        User u = getItem(position);
+        Log.d("abc","---chehking in bindViewhelper-->"+u.getName());
+        viewBinderHelper.bind(holder.swipeRevealLayout, String.valueOf(getItem(position).getUid()));
+        viewBinderHelper.closeLayout(String.valueOf(getItem(position).getUid()));
+        holder.bindData(getItem(position));
 
-        User user = userArrayList.get(position);
+        User user = getItem(position);
         holder.textViewName.setText(user.getName());
         holder.textViewNumber.setText(user.getContactNumber());
 
@@ -85,21 +107,21 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     .into(holder.imageViewProfilePic);
         }
 
-        if (selected_usersList.contains(userArrayList.get(position)))
+        if (selected_usersList.contains(getItem(position)))
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.sky_blue));
         else
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
-    @Override
-    public int getItemCount() {
-        return userArrayList == null ? 0 : userArrayList.size();
-    }
+//    @Override
+//    public int getItemCount() {
+//        return userArrayList == null ? 0 : userArrayList.size();
+//    }
 
-    public void updateData(ArrayList<User> userArrayList) {
-        this.userArrayList = userArrayList;
-        notifyDataSetChanged();
-    }
+//    public void updateData(ArrayList<User> userArrayList) {
+//        this.userArrayList = userArrayList;
+//        notifyDataSetChanged();
+//    }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -126,13 +148,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             mainLayout.setOnClickListener(v -> {
                 Log.d("abc", "cclliekd");
                 Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-                intentEditUserInfoActivity.putExtra("User", userArrayList.get(getAdapterPosition()));
+                intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
                 context.startActivity(intentEditUserInfoActivity);
             });
 
             txtEdit.setOnClickListener(v -> {
                 Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-                intentEditUserInfoActivity.putExtra("User", userArrayList.get(getAdapterPosition()));
+                intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
                 context.startActivity(intentEditUserInfoActivity);
                 Toast.makeText(context, "Edit Clicked", Toast.LENGTH_SHORT).show();
                 Log.d("abc", "edit clicked");
@@ -147,7 +169,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 };
 
                 AlertDialog.Builder ab = new AlertDialog.Builder(context);
-                ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(userArrayList.get(getAdapterPosition()), context));
+                ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(getItem(getAdapterPosition()), context));
                 ab.setMessage("Are you sure want to delete this contact? \n\nNote: Use long press to delete multiple contacts.")
                         .setNegativeButton("No", dialogClickListener).show();
 
