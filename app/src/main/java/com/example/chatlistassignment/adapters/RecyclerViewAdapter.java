@@ -1,12 +1,10 @@
 package com.example.chatlistassignment.adapters;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +19,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,14 +31,11 @@ import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
 import com.example.chatlistassignment.activities.FullScreenImageActivity;
-import com.example.chatlistassignment.activities.MainActivity;
 import com.example.chatlistassignment.model.User;
+import com.example.chatlistassignment.utils.HelperFunctions;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdapter.ViewHolder> {
 
@@ -50,6 +43,7 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
     ItemClickListener itemClickListener;
     private final ViewBinderHelper viewBinderHelper = new ViewBinderHelper();
     public ArrayList<User> selected_usersList = new ArrayList<>();
+    FragmentViewModel fragmentViewModel;
 
     private static DiffUtil.ItemCallback<User> DIFF_CALLBACK = new DiffUtil.ItemCallback<User>() {
         @Override
@@ -64,8 +58,9 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         }
     };
 
-    public RecyclerViewAdapter(Context context, ItemClickListener itemClickListener) {
+    public RecyclerViewAdapter(Context context, ItemClickListener itemClickListener, FragmentViewModel fragmentViewModel) {
         super(DIFF_CALLBACK);
+        this.fragmentViewModel = fragmentViewModel;
         this.context = context;
         this.itemClickListener = itemClickListener;
         viewBinderHelper.setOpenOnlyOne(true);
@@ -87,7 +82,17 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         viewBinderHelper.closeLayout(String.valueOf(getItem(position).getUid()));
         holder.bindData(getItem(position));
         holder.textViewName.setText(user.getName());
-        holder.textViewNumber.setText(user.getContactNumber());
+        holder.textViewNumber.setText(user.getContactNumbers().get(0));
+        holder.rowHeader.setText(HelperFunctions.getHeaderText(user.getDateOfBirth()));
+        holder.rowHeader.setVisibility(View.GONE);
+        if(position>0){
+            User user2 = getItem(position-1);
+            if(!HelperFunctions.getHeaderText(user.getDateOfBirth()).equals(HelperFunctions.getHeaderText((user2.getDateOfBirth())))){
+                holder.rowHeader.setVisibility(View.VISIBLE);
+            }else{holder.rowHeader.setVisibility(View.GONE);}
+        }else{
+            holder.rowHeader.setVisibility(View.VISIBLE);
+        }
 
         if (user.getProfilePic() == null) {
             holder.imageViewProfilePic.setImageResource(R.drawable.ic_baseline_person_24);
@@ -112,9 +117,36 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
                 } else {
                     Intent intent = new Intent(context, FullScreenImageActivity.class);
                     intent.putExtra("imageUri", getItem(position).getProfilePic());
+                    Log.d("abc", "profile pic path: "+getItem(position).getProfilePic());
+
                     context.startActivity(intent);
                 }
             }
+        });
+        holder.mainLayout.setOnClickListener(v -> {
+            Log.d("abc", "cclliekd");
+            Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
+            intentEditUserInfoActivity.putExtra("User", getItem(position));
+            context.startActivity(intentEditUserInfoActivity);
+        });
+        holder.txtEdit.setOnClickListener(v -> {
+            Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
+            intentEditUserInfoActivity.putExtra("User", getItem(position));
+            context.startActivity(intentEditUserInfoActivity);
+            Toast.makeText(context, "Edit Clicked", Toast.LENGTH_SHORT).show();
+            Log.d("abc", "edit clicked");
+
+        });
+        holder.txtDelete.setOnClickListener(v -> {
+            Log.d("abc", "Finally hrere");
+            DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                holder.swipeRevealLayout.close(true);
+            };
+            AlertDialog.Builder ab = new AlertDialog.Builder(context);
+            ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(getItem(position), context));
+            ab.setMessage("Are you sure want to delete this contact? \n\nNote: Use long press to delete multiple contacts.")
+                    .setNegativeButton("No", dialogClickListener).show();
+            notifyDataSetChanged();
         });
 
         if (selected_usersList.contains(getItem(position)))
@@ -123,9 +155,15 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
             holder.itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.white));
     }
 
+    @Override
+    public void registerAdapterDataObserver(@NonNull RecyclerView.AdapterDataObserver observer) {
+        super.registerAdapterDataObserver(observer);
+        notifyDataSetChanged();
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageViewProfilePic;
-        TextView textViewName, textViewNumber;
+        TextView textViewName, textViewNumber, rowHeader;
         Button txtEdit, txtDelete;
         RelativeLayout mainLayout;
         FragmentViewModel fragmentViewModel;
@@ -135,36 +173,14 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
             super(itemView);
             imageViewProfilePic = itemView.findViewById(R.id.image_view_profile_pic);
             textViewName = itemView.findViewById(R.id.text_view_name);
-            textViewNumber = itemView.findViewById(R.id.text_view_number);
+            textViewNumber = itemView.findViewById(R.id.edit_text_contact_number);
             txtDelete = itemView.findViewById(R.id.txtDelete);
             mainLayout = itemView.findViewById(R.id.main_layout);
             txtEdit = itemView.findViewById(R.id.txtEdit);
             swipeRevealLayout = itemView.findViewById(R.id.swipelayout);
+            rowHeader = itemView.findViewById(R.id.row_header);
             fragmentViewModel = ViewModelProviders.of((FragmentActivity) context).get(FragmentViewModel.class);
-            mainLayout.setOnClickListener(v -> {
-                Log.d("abc", "cclliekd");
-                Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-                intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
-                context.startActivity(intentEditUserInfoActivity);
-            });
-            txtEdit.setOnClickListener(v -> {
-                Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
-                intentEditUserInfoActivity.putExtra("User", getItem(getAdapterPosition()));
-                context.startActivity(intentEditUserInfoActivity);
-                Toast.makeText(context, "Edit Clicked", Toast.LENGTH_SHORT).show();
-                Log.d("abc", "edit clicked");
-            });
-            txtDelete.setOnClickListener(v -> {
-                Log.d("abc", "Finally hrere");
-                DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
-                    swipeRevealLayout.close(true);
-                };
-                AlertDialog.Builder ab = new AlertDialog.Builder(context);
-                ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(getItem(getAdapterPosition()), context));
-                ab.setMessage("Are you sure want to delete this contact? \n\nNote: Use long press to delete multiple contacts.")
-                        .setNegativeButton("No", dialogClickListener).show();
-
-            });
+            rowHeader.setVisibility(View.GONE);
         }
 
         void bindData(User user) {

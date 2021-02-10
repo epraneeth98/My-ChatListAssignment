@@ -15,9 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -25,31 +25,36 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.model.User;
+import com.example.chatlistassignment.utils.HelperFunctions;
 import com.example.chatlistassignment.utils.SaveBitmap;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 
 import static android.app.Activity.RESULT_CANCELED;
 
 public class DataEntryFragment extends Fragment implements View.OnClickListener {
 
-    TextInputLayout editTextUserName, editTextContactNumber;
+    TextInputLayout editTextUserName, editTextContactNumber, editTextContactNumber2, editTextContactNumber3;
     Button buttonSave;
+    ImageButton buttonAnotherEditText, buttonAnotherEditText2;
+    LinearLayout linearLayout2;
     TextInputEditText editTextDatePicker;
     String ProfilePicPath;
-    ImageView imageViewProfilePic,buttonSelectProfilePic;
+    ImageView imageViewProfilePic, buttonSelectProfilePic;
     FragmentViewModel fragmentViewModel;
+    long dateEnteredinMilli = 0;
 
     private final int REQUEST_CODE_CAMERA = 0;
     private final int REQUEST_CODE_GALLERY = 1;
@@ -72,6 +77,13 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void init(View view) {
         editTextUserName = view.findViewById(R.id.edit_text_username);
         editTextContactNumber = view.findViewById(R.id.edit_text_contact_number);
+        editTextContactNumber2 = view.findViewById(R.id.edit_text_contact_number2);
+        editTextContactNumber3 = view.findViewById(R.id.edit_text_contact_number3);
+        editTextContactNumber3.setVisibility(View.GONE);
+        linearLayout2 = view.findViewById(R.id.linear_layout_2);
+        linearLayout2.setVisibility(View.GONE);
+        buttonAnotherEditText = view.findViewById(R.id.add_another_mobile);
+        buttonAnotherEditText2 = view.findViewById(R.id.add_another_mobile2);
         editTextDatePicker = view.findViewById(R.id.text_view_date_picker);
         editTextDatePicker.setFocusable(false);
         buttonSave = view.findViewById(R.id.button_save);
@@ -86,7 +98,8 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
         editTextDatePicker.setOnClickListener(this);
         buttonSave.setOnClickListener(this);
         buttonSelectProfilePic.setOnClickListener(this);
-
+        buttonAnotherEditText.setOnClickListener(this);
+        buttonAnotherEditText2.setOnClickListener(this);
     }
 
     @Override
@@ -101,7 +114,21 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
             case R.id.text_view_date_picker:
                 buttonDatePickerClicked();
                 break;
+            case R.id.add_another_mobile:
+                addSecondEditText();
+                break;
+            case R.id.add_another_mobile2:
+                addThirdEditText();
+                break;
         }
+    }
+
+    private void addThirdEditText() {
+        editTextContactNumber3.setVisibility(View.VISIBLE);
+    }
+
+    private void addSecondEditText() {
+        linearLayout2.setVisibility(View.VISIBLE);
     }
 
     private void buttonDatePickerClicked() {
@@ -111,6 +138,7 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                 month = month + 1; // As Jan starts from 0
                 String date = dayOfMonth + "/" + month + "/" + year;
                 editTextDatePicker.setText(date);
+                dateEnteredinMilli = HelperFunctions.getDateinMilli(dayOfMonth, month, year);
             }
         },
                 Calendar.getInstance().get(Calendar.YEAR),
@@ -235,23 +263,42 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void saveButtonClicked() {
         String userName = editTextUserName.getEditText().getText().toString();
         String contactNumber = editTextContactNumber.getEditText().getText().toString();
+        String contactNumber2 = editTextContactNumber2.getEditText().getText().toString();
+        String contactNumber3 = editTextContactNumber3.getEditText().getText().toString();
+        ArrayList<String> contactNumbers = new ArrayList<>();
+        contactNumbers.add(contactNumber);
+        if(!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
+        if(!contactNumber3.equals("")) contactNumbers.add(contactNumber3);
+        if(!contactNumber.equals("") && contactNumber.charAt(0)!='+' && contactNumber.length()==10) contactNumber = "+91"+contactNumber;
+        if(!contactNumber2.equals("") && contactNumber2.charAt(0)!='+' && contactNumber2.length()==10) contactNumber2 = "+91"+contactNumber2;
+        if(!contactNumber3.equals("") && contactNumber3.charAt(0)!='+' && contactNumber3.length()==10) contactNumber3 = "+91"+contactNumber3;
 
-        if (userName.equals("") || contactNumber.equals("")) {
+        if (userName.equals("") || contactNumber.equals("") || dateEnteredinMilli==0) {
             Toast.makeText(getContext(), "Please enter all the details", Toast.LENGTH_SHORT).show();
             return;
         }
+        if(!checkMobileNumberConstraints(contactNumber, contactNumber2, contactNumber3)){
+            Toast.makeText(getContext(), "Enter Valid numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        String birthDateString = editTextDatePicker.getText().toString();
-        int indexOfColon = birthDateString.indexOf(":");
-        String birthDate = birthDateString.substring(indexOfColon + 1);
+        long currentTime= System.currentTimeMillis();
 
-        User user = new User(userName, contactNumber, ProfilePicPath, birthDate);
-        ProfilePicPath =  null;
+        User user = new User(userName, contactNumbers, ProfilePicPath, dateEnteredinMilli, currentTime, currentTime);
+        dateEnteredinMilli = 0;
+        ProfilePicPath = null;
         fragmentViewModel.addUser(user, getContext());
 
         clearInputFields();
         changeTabChatList();
 
+    }
+
+    private boolean checkMobileNumberConstraints(String contactNumber, String contactNumber2, String contactNumber3) {
+        if(!(contactNumber.equals("") || contactNumber.charAt(0)=='+' || contactNumber.length()<=10))return false;
+        if(!(contactNumber2.equals("") || contactNumber2.charAt(0)=='+' || contactNumber2.length()<=10))return false;
+        if(!(contactNumber3.equals("") || contactNumber3.charAt(0)=='+' || contactNumber3.length()<=10))return false;
+        return true;
     }
 
     private void changeTabChatList() {
@@ -262,7 +309,14 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void clearInputFields() {
         editTextUserName.getEditText().setText("");
         editTextContactNumber.getEditText().setText("");
+        editTextContactNumber2.getEditText().setText("");
+        editTextContactNumber3.getEditText().setText("");
+        editTextDatePicker.setText("");
+        linearLayout2.setVisibility(View.GONE);
+        editTextContactNumber3.setVisibility(View.GONE);
         editTextDatePicker.setText("");
         imageViewProfilePic.setImageResource(R.drawable.ic_baseline_person_24);
+
+        dateEnteredinMilli = 0;
     }
 }

@@ -2,9 +2,13 @@ package com.example.chatlistassignment.model;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity(tableName = "UserDB")
@@ -15,26 +19,72 @@ public class User implements Serializable {
 
     private String name;
     @NonNull
-    private String contactNumber;
+    @TypeConverters(MyTypeConverter.class)
+    private ArrayList<String> contactNumbers;
     private String profilePic;
-    private String dateOfBirth;
+    private long dateOfBirth;
+    private long createdAt;
+    private long lastUpdatedAt;
 
-    public User(String name, String contactNumber, String profilePic, String dateOfBirth) {
-        this.name = name;
-        this.contactNumber = contactNumber;
-        this.profilePic = profilePic;
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public User(int uid, String name, String contactNumber, String profilePic, String dateOfBirth) {
+    public User( @NonNull int uid, String name, @NonNull ArrayList<String> contactNumbers, String profilePic, long dateOfBirth, long lastUpdatedAt) {
         this.uid = uid;
         this.name = name;
-        this.contactNumber = contactNumber;
+        this.contactNumbers = contactNumbers;
+        this.profilePic = profilePic;
+        this.dateOfBirth = dateOfBirth;
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    @Ignore
+    public User(String name, @NonNull ArrayList<String> contactNumbers, String profilePic, long dateOfBirth,@NonNull long createdAt,@NonNull long lastUpdatedAt) {
+        this.name = name;
+        this.contactNumbers = contactNumbers;
+        this.profilePic = profilePic;
+        this.dateOfBirth = dateOfBirth;
+        this.createdAt = createdAt;
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public long getLastUpdatedAt() {
+        return lastUpdatedAt;
+    }
+
+    public void setLastUpdatedAt(long lastUpdatedAt) {
+        this.lastUpdatedAt = lastUpdatedAt;
+    }
+
+    @Ignore
+    public User(int uid, String name, @NonNull ArrayList<String> contactNumbers, String profilePic, long dateOfBirth) {
+        this.uid = uid;
+        this.name = name;
+        this.contactNumbers = contactNumbers;
         this.profilePic = profilePic;
         this.dateOfBirth = dateOfBirth;
     }
 
-    public User() {
+    @Ignore
+    public User(String name, @NonNull ArrayList<String> contactNumbers, String profilePic, long dateOfBirth) {
+        this.name = name;
+        this.contactNumbers = contactNumbers;
+        this.profilePic = profilePic;
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    @NonNull
+    public ArrayList<String> getContactNumbers() {
+        return contactNumbers;
+    }
+
+    public void setContactNumbers(@NonNull ArrayList<String> contactNumbers) {
+        this.contactNumbers = contactNumbers;
     }
 
     public int getUid() {
@@ -53,13 +103,6 @@ public class User implements Serializable {
         this.name = name;
     }
 
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
 
     public String getProfilePic() {
         return profilePic;
@@ -69,11 +112,11 @@ public class User implements Serializable {
         this.profilePic = profilePic;
     }
 
-    public String getDateOfBirth() {
+    public long getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(long dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
@@ -83,14 +126,16 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return uid == user.uid &&
-                name.equals(user.name) &&
-                Objects.equals(contactNumber, user.contactNumber) &&
+                Objects.equals(name, user.name) &&
+                contactNumbers.equals(user.contactNumbers) &&
                 Objects.equals(profilePic, user.profilePic) &&
                 Objects.equals(dateOfBirth, user.dateOfBirth);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, name, contactNumber, profilePic, dateOfBirth);
+        return Objects.hash(uid, name, contactNumbers, profilePic, dateOfBirth);
     }
+
+
 }

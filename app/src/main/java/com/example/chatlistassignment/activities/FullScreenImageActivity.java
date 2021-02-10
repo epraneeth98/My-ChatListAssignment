@@ -30,6 +30,7 @@ public class FullScreenImageActivity extends AppCompatActivity {
     private void init() {
         Log.d("abc", "In FullScreenImageactivity");
         imageView = findViewById(R.id.imageView);
+        Log.d("abc", "profile pic path in Activity: "+getIntent().getStringExtra("imageUri"));
         Glide.with(this)
                 .load(Uri.parse(getIntent().getStringExtra("imageUri")))
                 .placeholder(R.drawable.ic_baseline_person_24)

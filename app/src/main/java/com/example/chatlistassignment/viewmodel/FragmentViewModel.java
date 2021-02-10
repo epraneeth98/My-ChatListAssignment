@@ -144,7 +144,6 @@ public class FragmentViewModel extends AndroidViewModel {
 
         toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
         View view = toast.getView();
-
         //view.getBackground().setColorFilter(ContextCompat.getColor(context, R.color.teal_200), PorterDuff.Mode.SRC_IN);
 
         toast.show();

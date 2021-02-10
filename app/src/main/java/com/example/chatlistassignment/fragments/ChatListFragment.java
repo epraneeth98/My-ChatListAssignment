@@ -168,7 +168,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         alertDialogHelper = new AlertDialogHelper(getContext(), ChatListFragment.this);
         recyclerViewChatList = view.findViewById(R.id.recyclerview_chat_list);
         layoutManager = new LinearLayoutManager(getContext());
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), this);
+        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), this, fragmentViewModel );
         recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(recyclerViewAdapter);

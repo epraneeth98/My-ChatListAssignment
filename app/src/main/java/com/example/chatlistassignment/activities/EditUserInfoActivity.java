@@ -12,36 +12,41 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.model.User;
+import com.example.chatlistassignment.utils.HelperFunctions;
 import com.example.chatlistassignment.utils.SaveBitmap;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class EditUserInfoActivity extends AppCompatActivity implements View.OnClickListener {
 
-    TextInputLayout editTextName, editTextNumber;
+    TextInputLayout editTextName, editTextNumber, editTextNumber2, editTextNumber3;
     Button buttonSave;
-    TextView textViewBirthday, buttonDatePicker;
+    ImageButton addAnotherNumberButton, addAnotherNumberButton2;
+    TextView textViewBirthday;
+    LinearLayout linearLayout2;
     ImageView imageView, buttonImageSelect;
     String ProfilePicPath = null;
     int uid;
+    long dateInMilliSeconds = 0;
 
     FragmentViewModel fragmentViewModel;
     private final int REQUEST_CODE_CAMERA = 0;
@@ -51,10 +56,8 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user_info);
-
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         User user = (User) getIntent().getSerializableExtra("User");
         uid = user.getUid();
         ProfilePicPath = user.getProfilePic();
@@ -64,12 +67,19 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
 
     private void init(User user) {
         editTextName = findViewById(R.id.edit_text_name);
-        editTextNumber = findViewById(R.id.text_view_number);
-        buttonDatePicker = findViewById(R.id.text_view_birthday);
+        editTextNumber = findViewById(R.id.edit_text_contact_number);
+        editTextNumber2 = findViewById(R.id.edit_text_contact_number2);
+        editTextNumber3 = findViewById(R.id.edit_text_contact_number3);
+        addAnotherNumberButton = findViewById(R.id.add_another_mobile_button);
+        addAnotherNumberButton2 = findViewById(R.id.add_another_mobile_button2);
+        linearLayout2 = findViewById(R.id.linear_layout_2);
         buttonSave = findViewById(R.id.button_save);
         buttonImageSelect = findViewById(R.id.image_view_profile_pic);
         textViewBirthday = findViewById(R.id.text_view_birthday);
         imageView = findViewById(R.id.image_view_profile_pic);
+
+        setDataInEditTexts(user);
+
         if (user.getProfilePic() == null) {
             imageView.setImageResource(R.drawable.ic_baseline_person_24);
             Glide.with(this)
@@ -84,19 +94,36 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
                     .placeholder(R.drawable.ic_baseline_person_24)
                     .circleCrop()
                     .into(imageView);
-
         }
-
-        buttonDatePicker.setOnClickListener(this);
+        textViewBirthday.setOnClickListener(this);
         buttonSave.setOnClickListener(this);
         buttonImageSelect.setOnClickListener(this);
-
-        editTextName.getEditText().setText(user.getName());
-        editTextNumber.getEditText().setText(user.getContactNumber());
-
-        String DOBBuilder = "Date of Birth: " + user.getDateOfBirth();
-        textViewBirthday.setText(DOBBuilder);
+        addAnotherNumberButton.setOnClickListener(this);
+        addAnotherNumberButton2.setOnClickListener(this);
     }
+
+    private void setDataInEditTexts(User user) {
+        Log.d("abc", "Here in set data edit texts: " + user.getContactNumbers().get(0));
+        editTextName.getEditText().setText(user.getName());
+        String birthDate = HelperFunctions.getDay(user.getDateOfBirth())+"/"
+                +HelperFunctions.getMonth(user.getDateOfBirth())+"/"
+                +HelperFunctions.getYear(user.getDateOfBirth());
+        textViewBirthday.setText("Date of Birth: " + birthDate);
+        if (user.getContactNumbers().size() == 1) {
+            editTextNumber.getEditText().setText(user.getContactNumbers().get(0));
+            linearLayout2.setVisibility(View.GONE);
+            editTextNumber3.setVisibility(View.GONE);
+        } else if (user.getContactNumbers().size() == 2) {
+            editTextNumber.getEditText().setText(user.getContactNumbers().get(0));
+            editTextNumber2.getEditText().setText(user.getContactNumbers().get(1));
+            editTextNumber3.setVisibility(View.GONE);
+        } else {
+            editTextNumber.getEditText().setText(user.getContactNumbers().get(0));
+            editTextNumber2.getEditText().setText(user.getContactNumbers().get(1));
+            editTextNumber3.getEditText().setText(user.getContactNumbers().get(2));
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -109,6 +136,12 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
                 break;
             case R.id.image_view_profile_pic:
                 buttonSelectProfilePicClicked();
+                break;
+            case R.id.add_another_mobile_button:
+                linearLayout2.setVisibility(View.VISIBLE);
+                break;
+            case R.id.add_another_mobile_button2:
+                editTextNumber3.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -167,6 +200,7 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
             month = month + 1; // As Jan starts from 0
             String date = "Date of Birth:" + dayOfMonth + "/" + month + "/" + year;
             textViewBirthday.setText(date);
+            dateInMilliSeconds = HelperFunctions.getDateinMilli(dayOfMonth, month, year);
         },
                 Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),
@@ -221,9 +255,29 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
     private void saveButtonClicked() {
         String userName = editTextName.getEditText().getText().toString();
         String contactNumber = editTextNumber.getEditText().getText().toString();
+        String contactNumber2 = editTextNumber2.getEditText().getText().toString();
+        String contactNumber3 = editTextNumber3.getEditText().getText().toString();
+        ArrayList<String> contactNumbers = new ArrayList<>();
+        contactNumbers.add(contactNumber);
+        if (!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
+        if (!contactNumber3.equals("")) contactNumbers.add(contactNumber3);
+
+        if (!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
+        if (!contactNumber3.equals("")) contactNumbers.add(contactNumber3);
+        if (!contactNumber.equals("") && contactNumber.charAt(0) != '+' && contactNumber.length() == 10)
+            contactNumber = "+91" + contactNumber;
+        if (!contactNumber2.equals("") && contactNumber2.charAt(0) != '+' && contactNumber2.length() == 10)
+            contactNumber2 = "+91" + contactNumber2;
+        if (!contactNumber3.equals("") && contactNumber3.charAt(0) != '+' && contactNumber3.length() == 10)
+            contactNumber3 = "+91" + contactNumber3;
 
         if (userName.equals("") || contactNumber.equals("")) {
             Toast.makeText(this, "Please enter all the details", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!checkMobileNumberConstraints(contactNumber, contactNumber2, contactNumber3)) {
+            Toast.makeText(this, "Enter Valid numbers", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -231,11 +285,23 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
         int indexOfColon = birthDateString.indexOf(":");
         String birthDate = birthDateString.substring(indexOfColon + 1);
 
+        long currentTime = System.currentTimeMillis();
         Log.d("abc", "Here pfp: " + ProfilePicPath);
-        User userUpdated = new User(uid, userName, contactNumber, ProfilePicPath, birthDate);
+
+        User userUpdated = new User(uid, userName, contactNumbers, ProfilePicPath, dateInMilliSeconds, currentTime);
+        dateInMilliSeconds = 0;
         fragmentViewModel.updateUser(userUpdated, this);
         ProfilePicPath = null;
-
         onBackPressed();
+    }
+
+    private boolean checkMobileNumberConstraints(String contactNumber, String contactNumber2, String contactNumber3) {
+        if (!(contactNumber.equals("") || contactNumber.charAt(0) == '+' || contactNumber.length() <= 10))
+            return false;
+        if (!(contactNumber2.equals("") || contactNumber2.charAt(0) == '+' || contactNumber2.length() <= 10))
+            return false;
+        if (!(contactNumber3.equals("") || contactNumber3.charAt(0) == '+' || contactNumber3.length() <= 10))
+            return false;
+        return true;
     }
 }
