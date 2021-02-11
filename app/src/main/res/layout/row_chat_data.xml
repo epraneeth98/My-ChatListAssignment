@@ -7,7 +7,7 @@
         android:text="Date"
         android:gravity="center"
         android:layout_gravity="center"
-        android:textColor="@color/red"
+        android:textColor="@color/purple_500"
         android:textSize="20dp"
         android:padding="4dp"
         android:textStyle="bold"
@@ -16,7 +16,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/light_grey"/>
+        android:background="@color/very_light_grey"/>
 
     <com.chauthai.swipereveallayout.SwipeRevealLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"

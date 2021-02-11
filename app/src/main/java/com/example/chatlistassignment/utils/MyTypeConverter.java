@@ -1,4 +1,4 @@
-package com.example.chatlistassignment.model;
+package com.example.chatlistassignment.utils;
 
 import androidx.room.TypeConverter;
 

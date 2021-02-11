@@ -6,21 +6,25 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.MainThread;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 import androidx.paging.DataSource;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
+import com.example.chatlistassignment.model.Contact;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.repository.LocalRepository;
-import com.example.chatlistassignment.repository.room.UserDatabase;
+import com.example.chatlistassignment.repository.room.MyDatabase;
+import com.example.chatlistassignment.utils.SyncNativeContacts;
 
 import java.util.List;
 
 import io.reactivex.CompletableObserver;
+import io.reactivex.Scheduler;
+import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -29,11 +33,13 @@ import io.reactivex.schedulers.Schedulers;
 
 public class FragmentViewModel extends AndroidViewModel {
 
-    private UserDatabase userDatabase;
+    public final static String TAG = "TAG";
     private LocalRepository repository;
     private Toast toast;
     public LiveData<PagedList<User>> userList;
     public LiveData<PagedList<User>> queriedUserList;
+    public LiveData<PagedList<Contact>> contactList;
+    public LiveData<PagedList<Contact>> queryContactList;
 
     public static MutableLiveData<String> queryString = new MutableLiveData<>();
 
@@ -41,11 +47,19 @@ public class FragmentViewModel extends AndroidViewModel {
         super(application);
         repository = new LocalRepository(getApplication());
         userList = new LivePagedListBuilder<>(
-                repository.getAllUser(), /* page size */ 3).build();
+                repository.getAllUser(), /* page size */ 8).build();
+        contactList = new LivePagedListBuilder<>(
+                repository.getAllContacts(), 15).build();
     }
+
     public void queryInit(String query) {
         repository = new LocalRepository(getApplication());
-        queriedUserList = new LivePagedListBuilder<>(repository.queryAllUser(query), 5).build();
+        queriedUserList = new LivePagedListBuilder<>(repository.queryAllUser(query), 8).build();
+    }
+
+    public void queryContactInit(String query){
+        repository = new LocalRepository(getApplication());
+        queryContactList = new LivePagedListBuilder<>(repository.getQueryContact(query), 15).build();
     }
 
     public static void setQueryString(String query) {
@@ -171,6 +185,51 @@ public class FragmentViewModel extends AndroidViewModel {
         View view = toast.getView();
 
         toast.show();
+    }
+
+    public void completeContactSync() {
+        SyncNativeContacts syncNativeContacts = new SyncNativeContacts(getApplication());
+        syncNativeContacts.getContactArrayList().doAfterSuccess(contacts -> addContactsToDb(contacts))
+                .subscribeOn(Schedulers.io())
+                .subscribe(new SingleObserver<List<Contact>>() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.e(TAG, "onSubscribe: Inside complete sync  ");
+                    }
+
+                    @Override
+                    public void onSuccess(@NonNull List<Contact> contacts) {
+                        Log.e(TAG, "onSuccess: Inside complete sync: " + contacts.size());
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.e(TAG, "onError: Inside complete sync error: " + e.getMessage());
+                    }
+                });
+
+    }
+
+    private void addContactsToDb(List<Contact> contactList) {
+        repository.addContactListToDb(contactList)
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        Log.d("TAG", "Inside onSubscribe of addContactListDB");
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d("TAG", "Inside onComplete of addContactListDB");
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        Log.d("TAG", "Inside onError of addContactListDB");
+                    }
+                });
+
+
     }
 
 }

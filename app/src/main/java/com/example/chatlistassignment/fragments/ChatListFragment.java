@@ -2,7 +2,6 @@ package com.example.chatlistassignment.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -11,25 +10,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedList;
 import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
-import com.example.chatlistassignment.adapters.RecyclerViewAdapter;
+import com.example.chatlistassignment.adapters.ChatListAdapter;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.utils.AlertDialogHelper;
 import com.example.chatlistassignment.utils.RecyclerItemClickListener;
@@ -43,7 +37,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     ActionMode mActionMode;
     RecyclerView recyclerViewChatList;
     LinearLayoutManager layoutManager;
-    RecyclerViewAdapter recyclerViewAdapter;
+    ChatListAdapter chatListAdapter;
     List<User> userArrayList;
     ArrayList<User> queryArrayList;
     ArrayList<User> multiselect_list = new ArrayList<>();
@@ -137,7 +131,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
             @Override
             public void onChanged(PagedList<User> users) {
                 userArrayList = users.snapshot();
-                recyclerViewAdapter.submitList(users);
+                chatListAdapter.submitList(users);
             }
         });
     }
@@ -158,7 +152,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         fragmentViewModel.queriedUserList.observe(this, new Observer<PagedList<User>>() {
                     @Override
                     public void onChanged(PagedList<User> users) {
-                        recyclerViewAdapter.submitList(users);
+                        chatListAdapter.submitList(users);
                     }
                 }
         );
@@ -168,14 +162,14 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         alertDialogHelper = new AlertDialogHelper(getContext(), ChatListFragment.this);
         recyclerViewChatList = view.findViewById(R.id.recyclerview_chat_list);
         layoutManager = new LinearLayoutManager(getContext());
-        recyclerViewAdapter = new RecyclerViewAdapter(getContext(), this, fragmentViewModel );
+        chatListAdapter = new ChatListAdapter(getContext(), this, fragmentViewModel );
         recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
-        recyclerViewChatList.setAdapter(recyclerViewAdapter);
+        recyclerViewChatList.setAdapter(chatListAdapter);
     }
 
     public void refreshAdapter() {
-        recyclerViewAdapter.selected_usersList = multiselect_list;
+        chatListAdapter.selected_usersList = multiselect_list;
     }
 
     public void multi_select(int position) {
@@ -211,7 +205,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
                 userArrayList = multiselect_list;
                 for (int i = 0; i < multiselect_list.size(); i++)
                     fragmentViewModel.deleteUser(userArrayList.get(i), getContext());
-                recyclerViewAdapter.notifyDataSetChanged();
+                chatListAdapter.notifyDataSetChanged();
 
                 if (mActionMode != null) {
                     mActionMode.finish();

@@ -37,7 +37,7 @@ import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
 
-public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdapter.ViewHolder> {
+public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.ChatViewHolder> {
 
     Context context;
     ItemClickListener itemClickListener;
@@ -58,7 +58,7 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         }
     };
 
-    public RecyclerViewAdapter(Context context, ItemClickListener itemClickListener, FragmentViewModel fragmentViewModel) {
+    public ChatListAdapter(Context context, ItemClickListener itemClickListener, FragmentViewModel fragmentViewModel) {
         super(DIFF_CALLBACK);
         this.fragmentViewModel = fragmentViewModel;
         this.context = context;
@@ -68,13 +68,13 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.row_chat_data, parent, false);
-        return new ViewHolder(view);
+        return new ChatViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         viewBinderHelper.setOpenOnlyOne(true);
         User user = getItem(position);
         Log.d("abc", "In OnBindViewHolder in adapter: " + user.getName());
@@ -161,7 +161,7 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         notifyDataSetChanged();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageViewProfilePic;
         TextView textViewName, textViewNumber, rowHeader;
         Button txtEdit, txtDelete;
@@ -169,7 +169,7 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         FragmentViewModel fragmentViewModel;
         SwipeRevealLayout swipeRevealLayout;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             imageViewProfilePic = itemView.findViewById(R.id.image_view_profile_pic);
             textViewName = itemView.findViewById(R.id.text_view_name);

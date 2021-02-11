@@ -6,9 +6,10 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
+import com.example.chatlistassignment.utils.MyTypeConverter;
+
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Entity(tableName = "UserDB")

@@ -150,21 +150,15 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
 
     private void buttonSelectProfilePicClicked() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setTitle("Choose your profile picture");
-
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int item) {
                 if (options[item].equals("Take Photo")) {
-
                     checkPermissionAndStartCamera();
-
                 } else if (options[item].equals("Choose from Gallery")) {
-
                     checkPermissionAndOpenGallery();
-
                 } else
                     dialogInterface.dismiss();
             }
@@ -240,7 +234,6 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                             .placeholder(R.drawable.ic_baseline_person_24)
                             .circleCrop()
                             .into(imageViewProfilePic);
-
                     ProfilePicPath = cameraImageUri.toString();
                     break;
 
@@ -264,15 +257,24 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void saveButtonClicked() {
         String userName = editTextUserName.getEditText().getText().toString();
         String contactNumber = editTextContactNumber.getEditText().getText().toString();
+        if(HelperFunctions.checkNumber(contactNumber) == "Invalid" || contactNumber.equals("")){
+            Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String contactNumber2 = editTextContactNumber2.getEditText().getText().toString();
+        if(!(contactNumber2.equals("") || HelperFunctions.checkNumber(contactNumber2) != "Invalid")){
+            Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String contactNumber3 = editTextContactNumber3.getEditText().getText().toString();
+        if(!(contactNumber3.equals("") || HelperFunctions.checkNumber(contactNumber3) != "Invalid")){
+            Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
         ArrayList<String> contactNumbers = new ArrayList<>();
-        contactNumbers.add(contactNumber);
-        if(!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
-        if(!contactNumber3.equals("")) contactNumbers.add(contactNumber3);
-        if(!contactNumber.equals("") && contactNumber.charAt(0)!='+' && contactNumber.length()==10) contactNumber = "+91"+contactNumber;
-        if(!contactNumber2.equals("") && contactNumber2.charAt(0)!='+' && contactNumber2.length()==10) contactNumber2 = "+91"+contactNumber2;
-        if(!contactNumber3.equals("") && contactNumber3.charAt(0)!='+' && contactNumber3.length()==10) contactNumber3 = "+91"+contactNumber3;
+        contactNumbers.add(HelperFunctions.checkNumber(contactNumber));
+        if(!contactNumber2.equals("")) contactNumbers.add(HelperFunctions.checkNumber(contactNumber2));
+        if(!contactNumber3.equals("")) contactNumbers.add(HelperFunctions.checkNumber(contactNumber3));
 
         if (userName.equals("") || contactNumber.equals("") || dateEnteredinMilli==0) {
             Toast.makeText(getContext(), "Please enter all the details", Toast.LENGTH_SHORT).show();
