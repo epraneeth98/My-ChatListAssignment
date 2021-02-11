@@ -13,7 +13,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.chatlistassignment.model.MyTypeConverter;
 import com.example.chatlistassignment.model.User;
 
-@Database(entities = User.class, version = 2, exportSchema = false)
+@Database(entities = User.class, version = 1, exportSchema = false)
 public abstract class UserDatabase extends RoomDatabase {
 
     private static UserDatabase INSTANCE;
