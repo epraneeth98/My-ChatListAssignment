@@ -138,7 +138,8 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                 month = month + 1; // As Jan starts from 0
                 String date = dayOfMonth + "/" + month + "/" + year;
                 editTextDatePicker.setText(date);
-                dateEnteredinMilli = HelperFunctions.getDateinMilli(dayOfMonth, month, year);
+                dateEnteredinMilli = HelperFunctions.getDateinMilli(dayOfMonth, month-1, year);
+                Log.d("abc", "in datepickerclicked: "+dateEnteredinMilli);
             }
         },
                 Calendar.getInstance().get(Calendar.YEAR),
@@ -285,9 +286,9 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
         long currentTime= System.currentTimeMillis();
 
         User user = new User(userName, contactNumbers, ProfilePicPath, dateEnteredinMilli, currentTime, currentTime);
-        dateEnteredinMilli = 0;
         ProfilePicPath = null;
         fragmentViewModel.addUser(user, getContext());
+        dateEnteredinMilli = 0;
 
         clearInputFields();
         changeTabChatList();

@@ -83,6 +83,8 @@ public class RecyclerViewAdapter extends PagedListAdapter<User, RecyclerViewAdap
         holder.bindData(getItem(position));
         holder.textViewName.setText(user.getName());
         holder.textViewNumber.setText(user.getContactNumbers().get(0));
+        //holder.rowHeader.setText("jjjjj");
+        Log.d("abc", "in Adapter, milliseconds: "+user.getDateOfBirth());
         holder.rowHeader.setText(HelperFunctions.getHeaderText(user.getDateOfBirth()));
         holder.rowHeader.setVisibility(View.GONE);
         if(position>0){

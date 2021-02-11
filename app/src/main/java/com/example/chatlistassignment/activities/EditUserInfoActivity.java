@@ -105,6 +105,7 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
     private void setDataInEditTexts(User user) {
         Log.d("abc", "Here in set data edit texts: " + user.getContactNumbers().get(0));
         editTextName.getEditText().setText(user.getName());
+        dateInMilliSeconds = user.getDateOfBirth();
         String birthDate = HelperFunctions.getDay(user.getDateOfBirth())+"/"
                 +HelperFunctions.getMonth(user.getDateOfBirth())+"/"
                 +HelperFunctions.getYear(user.getDateOfBirth());
@@ -200,7 +201,7 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
             month = month + 1; // As Jan starts from 0
             String date = "Date of Birth:" + dayOfMonth + "/" + month + "/" + year;
             textViewBirthday.setText(date);
-            dateInMilliSeconds = HelperFunctions.getDateinMilli(dayOfMonth, month, year);
+            dateInMilliSeconds = HelperFunctions.getDateinMilli(dayOfMonth, month-1, year);
         },
                 Calendar.getInstance().get(Calendar.YEAR),
                 Calendar.getInstance().get(Calendar.MONTH),

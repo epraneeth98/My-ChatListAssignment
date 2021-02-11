@@ -1,5 +1,7 @@
 package com.example.chatlistassignment.utils;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -30,22 +32,12 @@ public class HelperFunctions {
 
     public static String getHeaderText(long milliSeconds) {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        long today = calendar.getTimeInMillis();
-        calendar.add(Calendar.DATE, -1);
-        long yesterday = calendar.getTimeInMillis();
         calendar.setTimeInMillis(milliSeconds);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        String month = months[calendar.get(Calendar.MONTH)-1].substring(0,3);
+        //String month = months[calendar.get(Calendar.MONTH)-1].substring(0,2);
         ///to do some stuff
-        return getDay(milliSeconds) + " " + month + " " + getYear(milliSeconds);
+        Log.d("abc", "milliseconds gotten: "+milliSeconds);
+        return calendar.get(Calendar.DAY_OF_MONTH) + " " + calendar.get(Calendar.MONTH) + " " + calendar.get(Calendar.YEAR);
     }
 
 }
