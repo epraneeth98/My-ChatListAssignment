@@ -115,6 +115,7 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
             linearLayout2.setVisibility(View.GONE);
             editTextNumber3.setVisibility(View.GONE);
         } else if (user.getContactNumbers().size() == 2) {
+            //Log.d("abc","In setDataInEditTexts: ");
             editTextNumber.getEditText().setText(user.getContactNumbers().get(0));
             editTextNumber2.getEditText().setText(user.getContactNumbers().get(1));
             editTextNumber3.setVisibility(View.GONE);
@@ -260,8 +261,6 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
         String contactNumber3 = editTextNumber3.getEditText().getText().toString();
         ArrayList<String> contactNumbers = new ArrayList<>();
         contactNumbers.add(contactNumber);
-        if (!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
-        if (!contactNumber3.equals("")) contactNumbers.add(contactNumber3);
 
         if (!contactNumber2.equals("")) contactNumbers.add(contactNumber2);
         if (!contactNumber3.equals("")) contactNumbers.add(contactNumber3);

@@ -19,6 +19,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.adapters.ViewPagerAdapter;
+import com.example.chatlistassignment.utils.ContactsChangeListener;
+import com.example.chatlistassignment.utils.IChangeListener;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import com.google.android.material.tabs.TabLayout;
 
@@ -30,6 +32,13 @@ public class MainActivity extends AppCompatActivity {
 
     FragmentViewModel fragmentViewModel;
     private int READ_CONTACT_REQUEST_CODE = 100;
+
+    IChangeListener iChangeListener = new IChangeListener() {
+        @Override
+        public void onContactsChanged() {
+            fragmentViewModel.completeContactSync();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACT_REQUEST_CODE);
         else
             fragmentViewModel.completeContactSync();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ContactsChangeListener.getInstance(this).startContactsObservation(iChangeListener);
     }
 
     @Override
@@ -99,5 +114,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ContactsChangeListener.getInstance(this).stopContactsObservation();
     }
 }
