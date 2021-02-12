@@ -15,9 +15,6 @@ public class ContactsChangeListener {
     private static ContactsChangeListener mContactsChangeListener;
     private static IChangeListener mListener;
 
-    private final static long MIN_WAIT_TIME = 2000;
-    private long mLastChangeProcessed = (long)0;
-
     private ContactsChangeListener(Context mContext) {
         mContentResolver = mContext.getContentResolver();
     }
@@ -42,12 +39,6 @@ public class ContactsChangeListener {
         mListener = null;
     }
 
-    private void notifyContactChanged() {
-        if (mListener != null) {
-            mListener.onContactsChanged();
-        }
-    }
-
 
     private class ContactsChangeObserver extends ContentObserver {
 
@@ -58,12 +49,18 @@ public class ContactsChangeListener {
         @Override
         public void onChange(boolean selfChange) {
             super.onChange(selfChange);
-            long mLastTimeChangeOccured = System.currentTimeMillis();
-            if (mLastTimeChangeOccured - mLastChangeProcessed > MIN_WAIT_TIME) {
-                notifyContactChanged();
-                Log.e("abc", "onChange:Contacts Changed , now call sync  ----------->> ");
-                mLastChangeProcessed = System.currentTimeMillis();
-            }
+            mListener.onContactsChanged();
         }
+
+//        @Override
+//        public void onChange(boolean selfChange) {
+//            super.onChange(selfChange);
+//            //long mLastTimeChangeOccured = System.currentTimeMillis();
+//            //if (mLastTimeChangeOccured - mLastChangeProcessed > MIN_WAIT_TIME) {
+//                notifyContactChanged();
+////                Log.e("abc", "onChange:Contacts Changed , now call sync  ----------->> ");
+////                mLastChangeProcessed = System.currentTimeMillis();
+//            //}
+//        }
     }
 }

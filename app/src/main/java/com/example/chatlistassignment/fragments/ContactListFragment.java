@@ -1,5 +1,6 @@
 package com.example.chatlistassignment.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,10 +11,12 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.adapters.ChatListAdapter;
@@ -26,6 +29,7 @@ public class ContactListFragment extends Fragment {
     RecyclerView recyclerView;
     ContactListAdapter contactListAdapter;
     FragmentViewModel fragmentViewModel;
+    TextView contacts_count;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,8 +45,29 @@ public class ContactListFragment extends Fragment {
         init(view);
         observeContactDB();
         observeQueryString();
+        observeContactsCount();
 
         return view;
+    }
+
+    private void init(View view) {
+        contactListAdapter = new ContactListAdapter();
+        recyclerView = view.findViewById(R.id.recyclerview_contact_list);
+        recyclerView.setAdapter(contactListAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+
+        contacts_count = view.findViewById(R.id.contact_count_text_view);
+    }
+
+    private void observeContactsCount() {
+        fragmentViewModel.getContactsCount().observe(getViewLifecycleOwner(), new Observer<Integer>(){
+            @Override
+            public void onChanged(Integer integer) {
+                Log.d("abc", "In OhChanged in ContactListFragment: "+integer);
+                contacts_count.setText("Total no. of Contacts: "+ integer);
+            }
+        });
     }
 
     private void observeQueryString() {
@@ -70,12 +95,4 @@ public class ContactListFragment extends Fragment {
         });
     }
 
-
-    private void init(View view) {
-        contactListAdapter = new ContactListAdapter();
-        recyclerView = view.findViewById(R.id.recyclerview_contact_list);
-        recyclerView.setAdapter(contactListAdapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-    }
 }

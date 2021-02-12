@@ -35,10 +35,10 @@ public class HelperFunctions {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-        String month = months[calendar.get(Calendar.MONTH)].substring(0, 3).toUpperCase();
+        String month = months[calendar.get(Calendar.MONTH)].substring(0, 3);
         Log.d("abc", "milliseconds gotten: " + milliSeconds);
-        if (DateUtils.isToday(milliSeconds)) return "TODAY";
-        else if (DateUtils.isToday(milliSeconds + 86400000)) return "YESTERDAY";
+        if (DateUtils.isToday(milliSeconds)) return "Today";
+        else if (DateUtils.isToday(milliSeconds + 86400000)) return "Yesterday";
         return calendar.get(Calendar.DAY_OF_MONTH) + " " + month;// + "-" + calendar.get(Calendar.YEAR);
     }
 

@@ -2,6 +2,8 @@ package com.example.chatlistassignment.viewmodel;
 
 import android.app.Application;
 import android.content.Context;
+import android.database.Cursor;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -20,10 +22,12 @@ import com.example.chatlistassignment.repository.LocalRepository;
 import com.example.chatlistassignment.repository.room.MyDatabase;
 import com.example.chatlistassignment.utils.SyncNativeContacts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.CompletableObserver;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
@@ -41,7 +45,24 @@ public class FragmentViewModel extends AndroidViewModel {
     public LiveData<PagedList<Contact>> contactList;
     public LiveData<PagedList<Contact>> queryContactList;
 
+    public static MutableLiveData<Integer> contactsCount = new MutableLiveData<>();
     public static MutableLiveData<String> queryString = new MutableLiveData<>();
+
+    public static void setQueryString(String query) {
+        queryString.setValue(query);
+    }
+
+    public LiveData<String> getQueryString() {
+        return queryString;
+    }
+
+    public static void setContactsCount(Integer contactsCountValue) {
+        contactsCount.postValue(contactsCountValue);
+    }
+
+    public LiveData<Integer> getContactsCount() {
+        return contactsCount;
+    }
 
     public FragmentViewModel(@androidx.annotation.NonNull Application application) {
         super(application);
@@ -57,18 +78,11 @@ public class FragmentViewModel extends AndroidViewModel {
         queriedUserList = new LivePagedListBuilder<>(repository.queryAllUser(query), 8).build();
     }
 
-    public void queryContactInit(String query){
+    public void queryContactInit(String query) {
         repository = new LocalRepository(getApplication());
         queryContactList = new LivePagedListBuilder<>(repository.getQueryContact(query), 15).build();
     }
 
-    public static void setQueryString(String query) {
-        queryString.setValue(query);
-    }
-
-    public LiveData<String> getQueryString() {
-        return queryString;
-    }
 
     public void addUser(User user, Context context) {
         repository.addUser(user)
@@ -189,7 +203,8 @@ public class FragmentViewModel extends AndroidViewModel {
 
     public void completeContactSync() {
         SyncNativeContacts syncNativeContacts = new SyncNativeContacts(getApplication());
-        syncNativeContacts.getContactArrayList().doAfterSuccess(contacts -> addContactsToDb(contacts))
+        syncNativeContacts.getContactArrayList().doAfterSuccess(contacts ->
+                addContactsToDb(contacts))
                 .subscribeOn(Schedulers.io())
                 .subscribe(new SingleObserver<List<Contact>>() {
                     @Override
@@ -228,8 +243,6 @@ public class FragmentViewModel extends AndroidViewModel {
                         Log.d("TAG", "Inside onError of addContactListDB");
                     }
                 });
-
-
     }
 
 }

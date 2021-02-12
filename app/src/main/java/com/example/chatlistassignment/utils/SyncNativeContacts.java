@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.example.chatlistassignment.model.Contact;
 import com.example.chatlistassignment.repository.LocalRepository;
+import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import com.google.gson.annotations.Since;
 
 import java.util.ArrayList;
@@ -16,11 +17,9 @@ import io.reactivex.Single;
 
 public class SyncNativeContacts {
     Context context;
-    LocalRepository localRepository;
 
     public SyncNativeContacts(Context context) {
         this.context = context;
-        this.localRepository = new LocalRepository(context);
     }
 
     public Single<List<Contact>> getContactArrayList() {
@@ -53,6 +52,8 @@ public class SyncNativeContacts {
                 }
                 cursor.close();
             }
+            Log.d("abc", "In SyncNativeContacts, contactsCount is: " + count);
+            FragmentViewModel.setContactsCount(count);
             return contactList;
 
         });

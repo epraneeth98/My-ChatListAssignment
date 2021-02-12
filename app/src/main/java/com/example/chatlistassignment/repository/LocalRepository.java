@@ -13,6 +13,7 @@ import com.example.chatlistassignment.repository.room.UserDao;
 import java.util.List;
 
 import io.reactivex.Completable;
+import io.reactivex.Single;
 
 public class LocalRepository {
 
@@ -56,4 +57,6 @@ public class LocalRepository {
     public DataSource.Factory<Integer, Contact> getQueryContact(String query){
         return contactDao.getQueryContacts(query);
     }
+
+    //public Single getContactsCount()
 }
