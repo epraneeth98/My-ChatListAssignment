@@ -51,7 +51,7 @@ public class ContactListFragment extends Fragment {
     }
 
     private void init(View view) {
-        contactListAdapter = new ContactListAdapter();
+        contactListAdapter = new ContactListAdapter(getContext());
         recyclerView = view.findViewById(R.id.recyclerview_contact_list);
         recyclerView.setAdapter(contactListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));

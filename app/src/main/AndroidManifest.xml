@@ -15,6 +15,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatListAssignment">
+        <activity android:name=".activities.ContactDetailsActivity"></activity>
         <activity android:name=".activities.FullScreenImageActivity" />
         <activity
             android:name=".activities.EditUserInfoActivity"

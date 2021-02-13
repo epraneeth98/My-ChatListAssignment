@@ -2,6 +2,7 @@ package com.example.chatlistassignment.utils;
 
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.Pair;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -53,6 +54,16 @@ public class HelperFunctions {
                 return "+91" + number;
             } else return "Invalid";
         }
+    }
+
+    public static Pair<String, String> splitString(String s) {
+        String[] words = s.split(":");
+        if (words.length == 1) {
+            Log.d("abc", "Anomaly: " + s);
+            return Pair.create(words[0], words[0]);
+        }
+        if (words.length == 0) return Pair.create("Not Available", "Main");
+        return Pair.create(words[0], words[1]);
     }
 
 }

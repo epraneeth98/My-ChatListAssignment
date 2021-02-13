@@ -56,8 +56,6 @@ public class EditUserInfoActivity extends AppCompatActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_user_info);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         User user = (User) getIntent().getSerializableExtra("User");
         uid = user.getUid();
         ProfilePicPath = user.getProfilePic();

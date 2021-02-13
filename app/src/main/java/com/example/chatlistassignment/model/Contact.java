@@ -1,5 +1,7 @@
 package com.example.chatlistassignment.model;
 
+import android.util.Pair;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -18,9 +20,17 @@ public class Contact implements Serializable {
     private String id;
     private String name;
     @TypeConverters(ListConverter.class)
-    private List<String> number;
+    private List<Pair<String, String>> number;
 
-    public Contact(@NonNull String id, String name, List<String> number) {
+    public List<Pair<String, String>> getNumber() {
+        return number;
+    }
+
+    public void setNumber(List<Pair<String, String>> number) {
+        this.number = number;
+    }
+
+    public Contact(@NonNull String id, String name, List<Pair<String, String>> number) {
         this.id = id;
         this.name = name;
         this.number = number;
@@ -43,12 +53,8 @@ public class Contact implements Serializable {
         this.name = name;
     }
 
-    public List<String> getNumber() {
+    public List<Pair<String, String>> getNumbers_list() {
         return number;
-    }
-
-    public void setNumber(List<String> number) {
-        this.number = number;
     }
 
     @Override

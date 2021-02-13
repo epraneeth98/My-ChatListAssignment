@@ -1,6 +1,7 @@
 package com.example.chatlistassignment.adapters;
 
 import android.app.AlertDialog;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
@@ -31,6 +33,7 @@ import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
 import com.example.chatlistassignment.activities.FullScreenImageActivity;
+import com.example.chatlistassignment.activities.MainActivity;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.utils.HelperFunctions;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
@@ -125,6 +128,9 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
         });
         holder.mainLayout.setOnClickListener(v -> {
             Log.d("abc", "cclliekd");
+//            FragmentTransaction fragmentTransaction = ((MainActivity) context).getFragmentManager().beginTransaction();
+//            ((MainActivity) context).getSupportFragmentManager().beginTransaction()
+//                    .add()
             Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
             intentEditUserInfoActivity.putExtra("User", getItem(position));
             context.startActivity(intentEditUserInfoActivity);
