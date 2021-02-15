@@ -23,7 +23,7 @@ public class HelperFunctions {
     public static int getMonth(long milliSeconds) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
-        return calendar.get(Calendar.MONTH);
+        return calendar.get(Calendar.MONTH)+1;
     }
 
     public static int getYear(long milliSeconds) {
@@ -45,7 +45,7 @@ public class HelperFunctions {
 
     public static String checkNumber(String number) {
         int len = number.length();
-        if (len > 12) return "Invalid";
+        if (len > 13) return "Invalid";
         else if (number.charAt(0) == '+') {
             if (len <= 10) return "Invalid";
             else return number;
@@ -62,7 +62,7 @@ public class HelperFunctions {
             Log.d("abc", "Anomaly: " + s);
             return Pair.create(words[0], words[0]);
         }
-        if (words.length == 0) return Pair.create("Not Available", "Main");
+        if (words.length == 0) return Pair.create("Not Available", "Not Available");
         return Pair.create(words[0], words[1]);
     }
 

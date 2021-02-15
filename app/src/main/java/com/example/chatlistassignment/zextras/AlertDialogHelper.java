@@ -1,19 +1,13 @@
-package com.example.chatlistassignment.utils;
+package com.example.chatlistassignment.zextras;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.os.Looper;
 import android.text.Html;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.appcompat.app.AlertDialog;
 
 import com.example.chatlistassignment.fragments.ChatListFragment;
-
-import static java.security.AccessController.getContext;
 
 public class AlertDialogHelper {
     Context context;

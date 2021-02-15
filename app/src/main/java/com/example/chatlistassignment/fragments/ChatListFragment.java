@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -23,10 +24,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.chatlistassignment.ItemClickListener;
 import com.example.chatlistassignment.R;
 import com.example.chatlistassignment.activities.EditUserInfoActivity;
+import com.example.chatlistassignment.activities.MainActivity;
 import com.example.chatlistassignment.adapters.ChatListAdapter;
 import com.example.chatlistassignment.model.User;
-import com.example.chatlistassignment.utils.AlertDialogHelper;
-import com.example.chatlistassignment.utils.RecyclerItemClickListener;
+import com.example.chatlistassignment.zextras.AlertDialogHelper;
+import com.example.chatlistassignment.zextras.RecyclerItemClickListener;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
@@ -45,6 +47,13 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
     boolean isMultiSelect = false;
     FragmentViewModel fragmentViewModel;
     AlertDialogHelper alertDialogHelper;
+
+    public static ChatListFragment newInstance() {
+        Bundle args = new Bundle();
+        ChatListFragment fragment = new ChatListFragment();
+        //fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -162,7 +171,7 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
         alertDialogHelper = new AlertDialogHelper(getContext(), ChatListFragment.this);
         recyclerViewChatList = view.findViewById(R.id.recyclerview_chat_list);
         layoutManager = new LinearLayoutManager(getContext());
-        chatListAdapter = new ChatListAdapter(getContext(), this, fragmentViewModel );
+        chatListAdapter = new ChatListAdapter(getContext(), this, fragmentViewModel);
         recyclerViewChatList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         recyclerViewChatList.setLayoutManager(layoutManager);
         recyclerViewChatList.setAdapter(chatListAdapter);
@@ -192,10 +201,14 @@ public class ChatListFragment extends Fragment implements ItemClickListener, Ale
 
     @Override
     public void onItemClicked(View view, int position) {
-        Log.d("abc", "Clicked !!");
-        Intent intentEditUserInfoActivity2 = new Intent(getContext(), EditUserInfoActivity.class);
-        intentEditUserInfoActivity2.putExtra("User", userArrayList.get(position));
-        startActivity(intentEditUserInfoActivity2);
+//        Log.d("abc", "Clicked !!");
+//        Intent intentEditUserInfoActivity2 = new Intent(getContext(), EditUserInfoActivity.class);
+//        intentEditUserInfoActivity2.putExtra("User", userArrayList.get(position));
+//        startActivity(intentEditUserInfoActivity2);
+
+        ((MainActivity) getActivity()).switchTodetailfragment(userArrayList.get(position));
+
+
     }
 
     @Override

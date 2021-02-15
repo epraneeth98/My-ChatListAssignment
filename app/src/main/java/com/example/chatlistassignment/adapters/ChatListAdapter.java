@@ -88,12 +88,14 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
         holder.textViewNumber.setText(user.getContactNumbers().get(0));
         holder.rowHeader.setText(HelperFunctions.getHeaderText(user.getDateOfBirth()));
         holder.rowHeader.setVisibility(View.GONE);
-        if(position>0){
-            User user2 = getItem(position-1);
-            if(!HelperFunctions.getHeaderText(user.getDateOfBirth()).equals(HelperFunctions.getHeaderText((user2.getDateOfBirth())))){
+        if (position > 0) {
+            User user2 = getItem(position - 1);
+            if (!HelperFunctions.getHeaderText(user.getDateOfBirth()).equals(HelperFunctions.getHeaderText((user2.getDateOfBirth())))) {
                 holder.rowHeader.setVisibility(View.VISIBLE);
-            }else{holder.rowHeader.setVisibility(View.GONE);}
-        }else{
+            } else {
+                holder.rowHeader.setVisibility(View.GONE);
+            }
+        } else {
             holder.rowHeader.setVisibility(View.VISIBLE);
         }
 
@@ -120,20 +122,19 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
                 } else {
                     Intent intent = new Intent(context, FullScreenImageActivity.class);
                     intent.putExtra("imageUri", getItem(position).getProfilePic());
-                    Log.d("abc", "profile pic path: "+getItem(position).getProfilePic());
-
+                    Log.d("abc", "profile pic path: " + getItem(position).getProfilePic());
                     context.startActivity(intent);
                 }
             }
         });
         holder.mainLayout.setOnClickListener(v -> {
             Log.d("abc", "cclliekd");
-//            FragmentTransaction fragmentTransaction = ((MainActivity) context).getFragmentManager().beginTransaction();
-//            ((MainActivity) context).getSupportFragmentManager().beginTransaction()
-//                    .add()
             Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
             intentEditUserInfoActivity.putExtra("User", getItem(position));
             context.startActivity(intentEditUserInfoActivity);
+
+            //((MainActivity) context).switchTodetailfragment(getItem(position));
+
         });
         holder.txtEdit.setOnClickListener(v -> {
             Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);

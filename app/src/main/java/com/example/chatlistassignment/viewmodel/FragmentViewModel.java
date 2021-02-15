@@ -194,10 +194,8 @@ public class FragmentViewModel extends AndroidViewModel {
 
         if (toast != null)
             toast.cancel();
-
         toast = Toast.makeText(context, message, Toast.LENGTH_SHORT);
         View view = toast.getView();
-
         toast.show();
     }
 

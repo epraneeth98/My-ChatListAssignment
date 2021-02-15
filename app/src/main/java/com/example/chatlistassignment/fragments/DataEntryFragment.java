@@ -40,7 +40,6 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Objects;
 
 import static android.app.Activity.RESULT_CANCELED;
 
@@ -51,10 +50,11 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     ImageButton buttonAnotherEditText, buttonAnotherEditText2;
     LinearLayout linearLayout2;
     TextInputEditText editTextDatePicker;
-    String ProfilePicPath;
+    String profilePicPath;
     ImageView imageViewProfilePic, buttonSelectProfilePic;
     FragmentViewModel fragmentViewModel;
     long dateEnteredinMilli = 0;
+    User currentUser;
 
     private final int REQUEST_CODE_CAMERA = 0;
     private final int REQUEST_CODE_GALLERY = 1;
@@ -65,10 +65,17 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
         fragmentViewModel = ViewModelProviders.of(this).get(FragmentViewModel.class);
     }
 
+    public static DataEntryFragment newInstance(User user) {
+        DataEntryFragment fragment = new DataEntryFragment();
+        Bundle args = new Bundle();
+        args.putSerializable("user", user);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View view = inflater.inflate(R.layout.fragment_data_entry, container, false);
         init(view);
         return view;
@@ -95,11 +102,58 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                 .placeholder(R.drawable.ic_baseline_person_24)
                 .into(imageViewProfilePic);
 
+        if (getArguments() != null) {
+            setDataInfragment();
+            buttonSave.setText("Save");
+        }
+
         editTextDatePicker.setOnClickListener(this);
-        buttonSave.setOnClickListener(this);
         buttonSelectProfilePic.setOnClickListener(this);
         buttonAnotherEditText.setOnClickListener(this);
         buttonAnotherEditText2.setOnClickListener(this);
+        buttonSave.setOnClickListener(this);
+    }
+
+    private void setDataInfragment() {
+        User user = (User) getArguments().getSerializable("user");
+        currentUser = user;
+        if (user.getProfilePic() != null) {
+            profilePicPath = user.getProfilePic();
+            Glide.with(this).load(Uri.parse(profilePicPath))
+                    .placeholder(R.drawable.ic_baseline_person_24)
+                    .circleCrop()
+                    .into(imageViewProfilePic);
+        } else {
+            Glide.with(this).load(R.drawable.ic_baseline_person_24)
+                    .placeholder(R.drawable.ic_baseline_person_24)
+                    .circleCrop()
+                    .into(imageViewProfilePic);
+        }
+        Log.d("abc", "Here in set DataEntryFragment: data edit texts: " + user.getContactNumbers().get(0));
+        editTextUserName.getEditText().setText(user.getName());
+        dateEnteredinMilli = user.getDateOfBirth();
+        String birthDate = HelperFunctions.getDay(user.getDateOfBirth()) + "/"
+                + HelperFunctions.getMonth(user.getDateOfBirth()) + "/"
+                + HelperFunctions.getYear(user.getDateOfBirth());
+        editTextDatePicker.setText(birthDate);
+        if (user.getContactNumbers().size() == 1) {
+            editTextContactNumber.getEditText().setText(user.getContactNumbers().get(0));
+            linearLayout2.setVisibility(View.GONE);
+            editTextContactNumber3.setVisibility(View.GONE);
+        } else if (user.getContactNumbers().size() == 2) {
+            //Log.d("abc","In setDataInEditTexts: ");
+            editTextContactNumber.getEditText().setText(user.getContactNumbers().get(0));
+            editTextContactNumber2.getEditText().setText(user.getContactNumbers().get(1));
+            linearLayout2.setVisibility(View.VISIBLE);
+            editTextContactNumber3.setVisibility(View.GONE);
+        } else {
+            editTextContactNumber.getEditText().setText(user.getContactNumbers().get(0));
+            editTextContactNumber2.getEditText().setText(user.getContactNumbers().get(1));
+            editTextContactNumber3.getEditText().setText(user.getContactNumbers().get(2));
+            linearLayout2.setVisibility(View.VISIBLE);
+            editTextContactNumber3.setVisibility(View.VISIBLE);
+        }
+        Log.d("abc", "argumetns, set");
     }
 
     @Override
@@ -138,8 +192,8 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                 month = month + 1; // As Jan starts from 0
                 String date = dayOfMonth + "/" + month + "/" + year;
                 editTextDatePicker.setText(date);
-                dateEnteredinMilli = HelperFunctions.getDateinMilli(dayOfMonth, month-1, year);
-                Log.d("abc", "in datepickerclicked: "+dateEnteredinMilli);
+                dateEnteredinMilli = HelperFunctions.getDateinMilli(dayOfMonth, month - 1, year);
+                Log.d("abc", "in datepickerclicked: " + dateEnteredinMilli);
             }
         },
                 Calendar.getInstance().get(Calendar.YEAR),
@@ -234,13 +288,13 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
                             .placeholder(R.drawable.ic_baseline_person_24)
                             .circleCrop()
                             .into(imageViewProfilePic);
-                    ProfilePicPath = cameraImageUri.toString();
+                    profilePicPath = cameraImageUri.toString();
                     break;
 
                 case REQUEST_CODE_GALLERY:
                     Uri selectedImageUri = data.getData();
                     Log.d("TAG", "URi: " + selectedImageUri.getPath());
-                    ProfilePicPath = selectedImageUri.toString();
+                    profilePicPath = selectedImageUri.toString();
                     Glide.with(getContext())
                             .load(selectedImageUri.toString())
                             .placeholder(R.drawable.ic_baseline_person_24)
@@ -257,56 +311,68 @@ public class DataEntryFragment extends Fragment implements View.OnClickListener 
     private void saveButtonClicked() {
         String userName = editTextUserName.getEditText().getText().toString();
         String contactNumber = editTextContactNumber.getEditText().getText().toString();
-        if(HelperFunctions.checkNumber(contactNumber) == "Invalid" || contactNumber.equals("")){
+        if (HelperFunctions.checkNumber(contactNumber) == "Invalid" || contactNumber.equals("")) {
             Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
             return;
         }
         String contactNumber2 = editTextContactNumber2.getEditText().getText().toString();
-        if(!(contactNumber2.equals("") || HelperFunctions.checkNumber(contactNumber2) != "Invalid")){
+        if (!(contactNumber2.equals("") || HelperFunctions.checkNumber(contactNumber2) != "Invalid")) {
             Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
             return;
         }
         String contactNumber3 = editTextContactNumber3.getEditText().getText().toString();
-        if(!(contactNumber3.equals("") || HelperFunctions.checkNumber(contactNumber3) != "Invalid")){
+        if (!(contactNumber3.equals("") || HelperFunctions.checkNumber(contactNumber3) != "Invalid")) {
             Toast.makeText(getContext(), "Enter Valid Mobile Numbers", Toast.LENGTH_SHORT).show();
             return;
         }
         ArrayList<String> contactNumbers = new ArrayList<>();
         contactNumbers.add(HelperFunctions.checkNumber(contactNumber));
-        if(!contactNumber2.equals("")) contactNumbers.add(HelperFunctions.checkNumber(contactNumber2));
-        if(!contactNumber3.equals("")) contactNumbers.add(HelperFunctions.checkNumber(contactNumber3));
+        if (!contactNumber2.equals(""))
+            contactNumbers.add(HelperFunctions.checkNumber(contactNumber2));
+        if (!contactNumber3.equals(""))
+            contactNumbers.add(HelperFunctions.checkNumber(contactNumber3));
 
-        if (userName.equals("") || contactNumber.equals("") || dateEnteredinMilli==0) {
+        if (userName.equals("") || contactNumber.equals("") || dateEnteredinMilli == 0) {
             Toast.makeText(getContext(), "Please enter all the details", Toast.LENGTH_SHORT).show();
             return;
         }
-        if(!checkMobileNumberConstraints(contactNumber, contactNumber2, contactNumber3)){
+        if (!checkMobileNumberConstraints(contactNumber, contactNumber2, contactNumber3)) {
             Toast.makeText(getContext(), "Enter Valid numbers", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        long currentTime= System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis();
+        if (getArguments() == null) {
+            User user = new User(userName, contactNumbers, profilePicPath, dateEnteredinMilli, currentTime, currentTime);
+            profilePicPath = null;
+            fragmentViewModel.addUser(user, getContext());
+        } else {
+            User user = new User(currentUser.getUid(), userName, contactNumbers, profilePicPath, dateEnteredinMilli, currentTime);
+            profilePicPath = null;
+            fragmentViewModel.updateUser(user, getContext());
+        }
 
-        User user = new User(userName, contactNumbers, ProfilePicPath, dateEnteredinMilli, currentTime, currentTime);
-        ProfilePicPath = null;
-        fragmentViewModel.addUser(user, getContext());
         dateEnteredinMilli = 0;
-
         clearInputFields();
         changeTabChatList();
 
     }
 
     private boolean checkMobileNumberConstraints(String contactNumber, String contactNumber2, String contactNumber3) {
-        if(!(contactNumber.equals("") || contactNumber.charAt(0)=='+' || contactNumber.length()<=10))return false;
-        if(!(contactNumber2.equals("") || contactNumber2.charAt(0)=='+' || contactNumber2.length()<=10))return false;
-        if(!(contactNumber3.equals("") || contactNumber3.charAt(0)=='+' || contactNumber3.length()<=10))return false;
+        if (!(contactNumber.equals("") || contactNumber.charAt(0) == '+' || contactNumber.length() <= 10))
+            return false;
+        if (!(contactNumber2.equals("") || contactNumber2.charAt(0) == '+' || contactNumber2.length() <= 10))
+            return false;
+        if (!(contactNumber3.equals("") || contactNumber3.charAt(0) == '+' || contactNumber3.length() <= 10))
+            return false;
         return true;
     }
 
     private void changeTabChatList() {
-        ViewPager viewPager = getActivity().findViewById(R.id.view_pager);
-        viewPager.setCurrentItem(0, true);
+        if(getArguments() == null) {
+            ViewPager viewPager = getActivity().findViewById(R.id.view_pager);
+            viewPager.setCurrentItem(0, true);
+        }else getActivity().finish();
     }
 
     private void clearInputFields() {

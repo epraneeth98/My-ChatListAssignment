@@ -1,4 +1,4 @@
-package com.example.chatlistassignment.utils;
+package com.example.chatlistassignment.zextras;
 
 import android.content.Context;
 import android.view.GestureDetector;
