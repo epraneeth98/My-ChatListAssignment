@@ -29,6 +29,7 @@ public class ContactsChangeListener {
 
     public void startContactsObservation(IChangeListener iChangeListener) {
         mContactsChangeObserver = new ContactsChangeObserver(new Handler(Looper.getMainLooper()));
+
         mContentResolver.registerContentObserver(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, true, mContactsChangeObserver);
         mListener = iChangeListener;
 

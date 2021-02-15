@@ -34,9 +34,13 @@ import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+
 
 public class ChatListFragment extends Fragment implements ItemClickListener, AlertDialogHelper.AlertDialogListener {
     ActionMode mActionMode;
+
+    @BindView(R.id.recyclerview_chat_list)
     RecyclerView recyclerViewChatList;
     LinearLayoutManager layoutManager;
     ChatListAdapter chatListAdapter;

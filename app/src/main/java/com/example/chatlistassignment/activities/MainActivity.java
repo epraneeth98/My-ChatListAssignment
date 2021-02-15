@@ -75,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Integer integer) {
                 Log.d("abc", "In OhChanged in ContactListFragment: " + integer);
-                //viewPager.setText("Total no. of Contacts: "+ integer);
             }
         });
     }
@@ -83,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermissionSyncContact() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) !=
                 PackageManager.PERMISSION_GRANTED)
-            requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACT_REQUEST_CODE);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, READ_CONTACT_REQUEST_CODE);
         else
             fragmentViewModel.completeContactSync();
     }
@@ -91,7 +90,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ContactsChangeListener.getInstance(this).startContactsObservation(iChangeListener);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) ==
+                PackageManager.PERMISSION_GRANTED) {
+            ContactsChangeListener.getInstance(this).startContactsObservation(iChangeListener);
+        }
     }
 
     @Override
