@@ -7,8 +7,6 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.example.chatlistassignment.utils.ListConverter;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
@@ -19,7 +17,7 @@ public class Contact implements Serializable {
     @NonNull
     private String id;
     private String name;
-    @TypeConverters(ListConverter.class)
+    @TypeConverters(ContactsTypeConverter.class)
     private List<Pair<String, String>> number;
 
     public List<Pair<String, String>> getNumber() {

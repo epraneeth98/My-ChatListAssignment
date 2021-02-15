@@ -110,17 +110,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu, menu);
         MenuItem searchViewItem = menu.findItem(R.id.app_bar_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchViewItem);
-
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 searchView.clearFocus();
-
                 FragmentViewModel.setQueryString(query);
                 Log.d("TAG", "Inside onQueryTextSubmit: " + query);
                 return false;

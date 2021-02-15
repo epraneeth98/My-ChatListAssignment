@@ -6,8 +6,6 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
-import com.example.chatlistassignment.utils.MyTypeConverter;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -20,7 +18,7 @@ public class User implements Serializable {
 
     private String name;
     @NonNull
-    @TypeConverters(MyTypeConverter.class)
+    @TypeConverters(UserTypeConverter.class)
     private ArrayList<String> contactNumbers;
     private String profilePic;
     private long dateOfBirth;

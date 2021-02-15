@@ -17,11 +17,14 @@ public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase INSTANCE;
 
-    public static MyDatabase getInstance(Context context) {
-        if (INSTANCE == null)
-            INSTANCE = Room.databaseBuilder(context, MyDatabase.class, "User_Database")
+    public static void initInstance(Context context){
+        INSTANCE = Room.databaseBuilder(context, MyDatabase.class, "User_Database")
                 .addMigrations(MIGRATION_1_2)
                 .build();
+    }
+
+    public static MyDatabase getInstance(Context context) {
+        if (INSTANCE == null) MyDatabase.initInstance(context);
         return INSTANCE;
     }
 

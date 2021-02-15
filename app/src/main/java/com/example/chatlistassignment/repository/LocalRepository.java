@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.paging.DataSource;
 
+import com.example.chatlistassignment.MyApplicationClass;
 import com.example.chatlistassignment.model.Contact;
 import com.example.chatlistassignment.model.User;
 import com.example.chatlistassignment.repository.room.ContactDao;

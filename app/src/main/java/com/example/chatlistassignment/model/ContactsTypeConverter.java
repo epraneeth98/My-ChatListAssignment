@@ -1,15 +1,17 @@
-package com.example.chatlistassignment.utils;
+package com.example.chatlistassignment.model;
 
 import android.text.TextUtils;
 import android.util.Pair;
 
 import androidx.room.TypeConverter;
 
+import com.example.chatlistassignment.utils.HelperFunctions;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ListConverter {
+public class ContactsTypeConverter {
     @TypeConverter
     public static List<Pair<String, String>> stringToList(String stringList) {
         List<String> tempList = Arrays.asList(stringList.split(","));

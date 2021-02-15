@@ -1,4 +1,4 @@
-package com.example.chatlistassignment.utils;
+package com.example.chatlistassignment.model;
 
 import androidx.room.TypeConverter;
 
@@ -9,7 +9,7 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 
 
-public class MyTypeConverter {
+public class UserTypeConverter {
 
     @TypeConverter
     public static ArrayList<String> fromString(String value) {
