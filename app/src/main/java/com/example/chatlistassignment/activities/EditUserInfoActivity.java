@@ -38,6 +38,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class EditUserInfoActivity extends AppCompatActivity{
 
     TextInputLayout editTextName, editTextNumber, editTextNumber2, editTextNumber3;

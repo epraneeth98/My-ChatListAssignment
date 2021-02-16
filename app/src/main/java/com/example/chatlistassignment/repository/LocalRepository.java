@@ -13,6 +13,10 @@ import com.example.chatlistassignment.repository.room.UserDao;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import dagger.hilt.android.HiltAndroidApp;
 import io.reactivex.Completable;
 import io.reactivex.Single;
 
@@ -21,10 +25,14 @@ public class LocalRepository {
     private UserDao userDao;
     private ContactDao contactDao;
 
-    public LocalRepository(Context ctx) {
-        userDao = MyDatabase.getInstance(ctx).userDao();
-        contactDao = MyDatabase.getInstance(ctx).contactDao();
+    @Inject
+    public LocalRepository(Context ctx, UserDao userDao, ContactDao contactDao) {
+        this.userDao = userDao;
+        //userDao = MyDatabase.getInstance(ctx).userDao();
+        this.contactDao = contactDao;
+        //contactDao = MyDatabase.getInstance(ctx).contactDao();
     }
+
     /////////User
     public Completable addUser(User user) {
         return userDao.addUser(user);

@@ -33,6 +33,9 @@ import com.example.chatlistassignment.utils.IChangeListener;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 import com.google.android.material.tabs.TabLayout;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     ViewPager viewPager;

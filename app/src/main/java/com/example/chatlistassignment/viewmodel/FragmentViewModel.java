@@ -25,6 +25,9 @@ import com.example.chatlistassignment.utils.SyncNativeContacts;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.lifecycle.HiltViewModel;
 import io.reactivex.CompletableObserver;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -34,7 +37,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-
+@HiltViewModel
 public class FragmentViewModel extends AndroidViewModel {
 
     public final static String TAG = "TAG";
@@ -44,9 +47,16 @@ public class FragmentViewModel extends AndroidViewModel {
     public LiveData<PagedList<User>> queriedUserList;
     public LiveData<PagedList<Contact>> contactList;
     public LiveData<PagedList<Contact>> queryContactList;
-
     public static MutableLiveData<Integer> contactsCount = new MutableLiveData<>();
     public static MutableLiveData<String> queryString = new MutableLiveData<>();
+
+    @Inject
+    public FragmentViewModel(@androidx.annotation.NonNull Application application, LocalRepository localRepository) {
+        super(application);
+        this.repository = localRepository;
+        //repository = new LocalRepository(getApplication());
+        init();
+    }
 
     public static void setQueryString(String query) {
         queryString.setValue(query);
@@ -64,9 +74,7 @@ public class FragmentViewModel extends AndroidViewModel {
         return contactsCount;
     }
 
-    public FragmentViewModel(@androidx.annotation.NonNull Application application) {
-        super(application);
-        repository = new LocalRepository(getApplication());
+    private void init() {
         userList = new LivePagedListBuilder<>(
                 repository.getAllUser(), /* page size */ 8).build();
         contactList = new LivePagedListBuilder<>(
@@ -74,12 +82,10 @@ public class FragmentViewModel extends AndroidViewModel {
     }
 
     public void queryInit(String query) {
-        repository = new LocalRepository(getApplication());
         queriedUserList = new LivePagedListBuilder<>(repository.queryAllUser(query), 8).build();
     }
 
     public void queryContactInit(String query) {
-        repository = new LocalRepository(getApplication());
         queryContactList = new LivePagedListBuilder<>(repository.getQueryContact(query), 15).build();
     }
 

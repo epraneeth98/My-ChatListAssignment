@@ -13,12 +13,10 @@ public class AlertDialogHelper {
     Context context;
     AlertDialog alertDialog = null;
     AlertDialogListener callBack;
-    Activity current_activity;
     ChatListFragment chatListFragment;
 
     public AlertDialogHelper(Context context, ChatListFragment chatListFragment) {
         this.context = context;
-        this.current_activity = (Activity) context;
         this.chatListFragment = chatListFragment;
         callBack = (AlertDialogListener) chatListFragment;
     }

@@ -20,6 +20,7 @@ public abstract class MyDatabase extends RoomDatabase {
     public static void initInstance(Context context){
         INSTANCE = Room.databaseBuilder(context, MyDatabase.class, "User_Database")
                 .addMigrations(MIGRATION_1_2)
+                // .allowMainThreadQueries()
                 .build();
     }
 

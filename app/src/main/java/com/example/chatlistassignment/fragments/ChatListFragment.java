@@ -32,8 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
+import dagger.hilt.android.AndroidEntryPoint;
 
-
+@AndroidEntryPoint
 public class ChatListFragment extends Fragment implements ItemClickListener, AlertDialogHelper.AlertDialogListener {
     ActionMode mActionMode;
 

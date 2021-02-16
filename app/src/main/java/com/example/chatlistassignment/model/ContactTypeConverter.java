@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ContactsTypeConverter {
+public class ContactTypeConverter {
     @TypeConverter
     public static List<Pair<String, String>> stringToList(String stringList) {
         List<String> tempList = Arrays.asList(stringList.split(","));

@@ -24,6 +24,9 @@ import com.example.chatlistassignment.adapters.ContactListAdapter;
 import com.example.chatlistassignment.model.Contact;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ContactListFragment extends Fragment {
 
     RecyclerView recyclerView;

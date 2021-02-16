@@ -15,6 +15,9 @@ import com.example.chatlistassignment.utils.HelperFunctions;
 
 import java.util.ArrayList;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ContactDetailsActivity extends AppCompatActivity {
 
     ListView listView;

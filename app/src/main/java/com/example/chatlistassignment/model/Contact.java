@@ -17,7 +17,7 @@ public class Contact implements Serializable {
     @NonNull
     private String id;
     private String name;
-    @TypeConverters(ContactsTypeConverter.class)
+    @TypeConverters(ContactTypeConverter.class)
     private List<Pair<String, String>> number;
 
     public List<Pair<String, String>> getNumber() {

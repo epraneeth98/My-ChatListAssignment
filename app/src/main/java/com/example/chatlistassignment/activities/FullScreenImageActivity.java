@@ -15,6 +15,9 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.example.chatlistassignment.R;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class FullScreenImageActivity extends AppCompatActivity {
 
     private ImageView imageView;

@@ -4,6 +4,9 @@ import android.app.Application;
 
 import com.example.chatlistassignment.repository.room.MyDatabase;
 
+import dagger.hilt.android.HiltAndroidApp;
+
+@HiltAndroidApp
 public class MyApplicationClass extends Application {
     @Override
     public void onCreate() {
