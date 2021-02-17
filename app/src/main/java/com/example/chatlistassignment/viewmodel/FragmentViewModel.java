@@ -78,7 +78,7 @@ public class FragmentViewModel extends AndroidViewModel {
         userList = new LivePagedListBuilder<>(
                 repository.getAllUser(), /* page size */ 8).build();
         contactList = new LivePagedListBuilder<>(
-                repository.getAllContacts(), 15).build();
+                repository.getAllContacts(), 8).build();
     }
 
     public void queryInit(String query) {

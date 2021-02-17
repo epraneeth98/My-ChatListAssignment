@@ -22,12 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContactListAdapter extends PagedListAdapter<Contact, ContactListAdapter.ContactViewHolder> {
-
-
     Context mContext;
 
     public static DiffUtil.ItemCallback<Contact> DIFF_CALLBACK = new DiffUtil.ItemCallback<Contact>() {
-
         @Override
         public boolean areItemsTheSame(@NonNull Contact oldItem, @NonNull Contact newItem) {
             return oldItem.getId() == newItem.getId();

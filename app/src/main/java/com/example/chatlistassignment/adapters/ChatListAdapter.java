@@ -21,7 +21,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelStoreOwner;
 import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +41,8 @@ import com.example.chatlistassignment.utils.HelperFunctions;
 import com.example.chatlistassignment.viewmodel.FragmentViewModel;
 
 import java.util.ArrayList;
+
+import dagger.hilt.android.internal.managers.FragmentComponentManager;
 
 public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.ChatViewHolder> {
 
@@ -86,11 +90,11 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
         holder.bindData(getItem(position));
         holder.textViewName.setText(user.getName());
         holder.textViewNumber.setText(user.getContactNumbers().get(0));
-        holder.rowHeader.setText(HelperFunctions.getHeaderText(user.getDateOfBirth()));
+        holder.rowHeader.setText(HelperFunctions.getHeaderText(user.getLastUpdatedAt()));
         holder.rowHeader.setVisibility(View.GONE);
         if (position > 0) {
             User user2 = getItem(position - 1);
-            if (!HelperFunctions.getHeaderText(user.getDateOfBirth()).equals(HelperFunctions.getHeaderText((user2.getDateOfBirth())))) {
+            if (!HelperFunctions.getHeaderText(user.getLastUpdatedAt()).equals(HelperFunctions.getHeaderText((user2.getLastUpdatedAt())))) {
                 holder.rowHeader.setVisibility(View.VISIBLE);
             } else {
                 holder.rowHeader.setVisibility(View.GONE);
@@ -132,9 +136,6 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
             Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
             intentEditUserInfoActivity.putExtra("User", getItem(position));
             context.startActivity(intentEditUserInfoActivity);
-
-            //((MainActivity) context).switchTodetailfragment(getItem(position));
-
         });
         holder.txtEdit.setOnClickListener(v -> {
             Intent intentEditUserInfoActivity = new Intent(context, EditUserInfoActivity.class);
@@ -150,8 +151,11 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
                 holder.swipeRevealLayout.close(true);
             };
             AlertDialog.Builder ab = new AlertDialog.Builder(context);
-            ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> fragmentViewModel.deleteUser(getItem(position), context));
-            ab.setMessage("Are you sure want to delete this contact? \n\nNote: Use long press to delete multiple contacts.")
+            ab.setPositiveButton(Html.fromHtml("<font color='#FF0000'>Delete</font>"), (dialog, which) -> {
+                fragmentViewModel.deleteUser(getItem(position), context);
+                notifyDataSetChanged();
+            });
+            ab.setMessage("Are you sure want to delete this contact?")
                     .setNegativeButton("No", dialogClickListener).show();
             notifyDataSetChanged();
         });
@@ -186,7 +190,7 @@ public class ChatListAdapter extends PagedListAdapter<User, ChatListAdapter.Chat
             txtEdit = itemView.findViewById(R.id.txtEdit);
             swipeRevealLayout = itemView.findViewById(R.id.swipelayout);
             rowHeader = itemView.findViewById(R.id.row_header);
-            fragmentViewModel = ViewModelProviders.of((FragmentActivity) context).get(FragmentViewModel.class);
+            fragmentViewModel = ViewModelProviders.of((FragmentActivity) FragmentComponentManager.findActivity(context)).get(FragmentViewModel.class);
             rowHeader.setVisibility(View.GONE);
         }
 

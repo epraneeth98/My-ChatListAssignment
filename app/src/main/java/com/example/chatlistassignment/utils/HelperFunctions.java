@@ -52,7 +52,7 @@ public class HelperFunctions {
         } else {
             if (len >= 10) {
                 return "+91" + number;
-            } else return "Invalid";
+            } else return number;
         }
     }
 

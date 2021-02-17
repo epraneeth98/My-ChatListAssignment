@@ -23,7 +23,7 @@ public interface UserDao {
     @Delete
     Completable deleteUser(User user);
 
-    @Query("select * from userdb Order by dateOfBirth desc")
+    @Query("select * from userdb Order by lastUpdatedAt desc")
     DataSource.Factory<Integer, User> getAllUser();
 
     @Update
