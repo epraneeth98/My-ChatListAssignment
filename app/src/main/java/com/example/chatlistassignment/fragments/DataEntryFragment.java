@@ -47,7 +47,6 @@ import static android.app.Activity.RESULT_CANCELED;
 
 @AndroidEntryPoint
 public class DataEntryFragment extends Fragment implements View.OnClickListener {
-
     TextInputLayout editTextUserName, editTextContactNumber, editTextContactNumber2, editTextContactNumber3;
     Button buttonSave;
     ImageButton buttonAnotherEditText, buttonAnotherEditText2;
